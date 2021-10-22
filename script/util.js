@@ -184,3 +184,32 @@ export function getDistance(pos1, pos2) {
 export function getRandomRange(min, max) {
     return Math.random() * (max - min) + min;
 }
+
+/**
+ * pos1からpos2への向きを計算
+ * @param {Pos} pos1 
+ * @param {Pos} pos2 
+ * @returns {number} 角度
+ */
+export function getAngleToPos(pos1, pos2) {
+    let rad = Math.atan2(pos2.y - pos1.y, pos2.x - pos1.x);
+    return rad * (180 / Math.PI);
+}
+
+/**
+ * 当たった辺と今の角度から反射角を出す
+ * @param {number} angle - 今の角度
+ * @param {number} edge - RectEdgeDirection
+ */
+export function getReflectAngle(angle, edge = RectEdgeDirection.NONE) {
+    switch (edge) {
+        case RectEdgeDirection.LEFT:
+        case RectEdgeDirection.RIGHT:
+            return 180 - angle;
+        case RectEdgeDirection.UP:
+        case RectEdgeDirection.DOWN:
+            return 360 - angle;
+        default:
+            return angle;
+    }
+}
