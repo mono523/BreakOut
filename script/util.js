@@ -77,6 +77,13 @@ export class Rect {
     }
     /**
      * セッター
+     * @param {Pos} pos 
+     */
+    setPos(pos){
+        this.pos = pos;
+    }
+    /**
+     * セッター
      * @param {number} width 
      * @param {number} height 
      */
@@ -84,6 +91,14 @@ export class Rect {
         this.width = width;
         this.height = height
     }
+
+    /**
+     * Rectの各数値を返す
+     * @returns {number[]}
+     */
+    getRectParam(){
+        return [this.pos.x,this.pos.y,this.width,this.height];
+        }
 
     /**
      * Rectの中心座標のPosを返す
