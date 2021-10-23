@@ -303,3 +303,21 @@ export function getTypeColor(type) {
             return "rgb(255, 255, 255)";
     }
 }
+/**
+ * 指定した座標が中心になるように文字を描画する
+ * @param {string} text
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number|Pos} x
+ * @param {number} y
+ * @returns {number[]} - 描画した座標
+ */
+export function renderTextToCenterPos(text,ctx,x,y=0){
+    if(x instanceof Pos){
+        [x,y] = x.getPos();
+    }
+    let txt = ctx.measureText(text);
+    let width = txt.width;
+    let render_x = x - (width/2);
+    ctx.strokeText(text,render_x,y);
+    return [render_x,y];
+}
