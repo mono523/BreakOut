@@ -25,6 +25,7 @@ export class Entity {
         this.rate_x = 0;
         this.rate_y = 0;
         this.dead_flag = false;
+        this.setAngle(angle);
     }
     /**
      * セッター
@@ -39,7 +40,7 @@ export class Entity {
      * 毎フレーム呼ぶこと
      */
     update() {
-        this.rect.setPos(this.pos);
+        this.rect.setPos(this.pos.copy());
         this.frame_count++;
     }
     /**

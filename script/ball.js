@@ -18,12 +18,12 @@ export class Ball extends Entity {
      * @param {number} type - 種類
      */
     constructor(pos, angle, size, type) {
-        super(pos, new util.Rect(pos.copy(), size, size), angle, 5);
+        super(pos, new util.Rect(pos.copy(), size, size), angle, 10);
         this.type = type;
         this.size = size;
     }
     update() {
-        this.go_forward();
+        this.goForward();
         super.update();
     }
     /**
