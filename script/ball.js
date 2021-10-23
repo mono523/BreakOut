@@ -30,12 +30,13 @@ export class Ball extends Entity {
      * 描画
      * @param {CanvasRenderingContext2D} ctx 
      */
-    render(ctx){
+    render(ctx) {
         let old_style = ctx.fillStyle;
         ctx.fillStyle = util.getTypeColor(this.type);
         ctx.beginPath()
         ctx.arc(this.pos.x, this.pos.y, this.size, 0, Math.PI * 2, true);
         ctx.fill()
         ctx.fillStyle = old_style;
+
     }
 }

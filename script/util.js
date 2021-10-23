@@ -254,8 +254,8 @@ export const COLOR_TYPE = {
  * @param {number} type 
  * @returns {string}
  */
-export function getTypeColor(type){
-    switch(type){
+export function getTypeColor(type) {
+    switch (type) {
         case COLOR_TYPE.WHITE:
             return "rgb(255, 255, 255)";
         case COLOR_TYPE.BLACK:
