@@ -94,6 +94,7 @@ function MainLoop() { }
  */
 function Init() {
     CANVAS = document.getElementById("canvas");
+    // @ts-ignore
     CANVAS_CONTEXT = CANVAS.getContext("2d");
     if (CANVAS_CONTEXT == undefined) {
         return false;
