@@ -58,7 +58,7 @@ var GAME_STATUS = 0;
  */
 function KeyDown(evt) {
     //押されたキーの判別
-    switch (evt.key) {
+    switch (evt.code) {
         case "Up":
         case "ArrowUp":
             KeyStatus.Up = true;
@@ -75,8 +75,7 @@ function KeyDown(evt) {
         case "ArrowRight":
             KeyStatus.Right = true;
             break;
-        case "z":
-        case "Z":
+        case "Space":
             KeyStatus.Shot = true;
             break;
     }
@@ -87,7 +86,7 @@ function KeyDown(evt) {
  */
 function KeyUp(evt) {
     // 離されたキーの判別
-    switch (evt.key) {
+    switch (evt.code) {
         case "Up":
         case "ArrowUp":
             KeyStatus.Up = false;
@@ -104,8 +103,7 @@ function KeyUp(evt) {
         case "ArrowRight":
             KeyStatus.Right = false;
             break;
-        case "z":
-        case "Z":
+        case "Space":
             KeyStatus.Shot = false;
             break;
     }
