@@ -45,7 +45,7 @@ export class Entity {
     /**
      * 前に進む
      */
-    go_forward() {
+    goForward() {
         this.pos.x += this.speed * this.rate_x;
         this.pos.y += this.speed * this.rate_y;
     }
