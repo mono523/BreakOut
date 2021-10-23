@@ -186,6 +186,29 @@ export class Rect {
         return new Rect(this.pos.copy(), this.width, this.height);
     }
 }
+
+export class Clock{
+    /**
+     * フレーム管理など行うクラス
+     * @param {number} fps 
+     */
+    constructor(fps){
+        this.fps = fps;
+        this.last_tick = 0;
+        this.last_call_time = performance.now();
+    }
+    /**
+     * calc tick
+     * @returns {number} - 前回の呼び出しからのtick
+     */
+    tick(){
+        let time = performance.now();
+        this.last_tick = time - this.last_call_time;
+        this.last_call_time = time;
+        return this.last_tick;
+    }
+}
+
 /**
  * 
  * @param {Pos} pos1 
