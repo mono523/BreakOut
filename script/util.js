@@ -186,6 +186,29 @@ export class Rect {
         return new Rect(this.pos.copy(), this.width, this.height);
     }
 }
+
+export class Clock{
+    /**
+     * フレーム管理など行うクラス
+     * @param {number} fps 
+     */
+    constructor(fps){
+        this.fps = fps;
+        this.last_tick = 0;
+        this.last_call_time = performance.now();
+    }
+    /**
+     * calc tick
+     * @returns {number} - 前回の呼び出しからのtick
+     */
+    tick(){
+        let time = performance.now();
+        this.last_tick = time - this.last_call_time;
+        this.last_call_time = time;
+        return this.last_tick;
+    }
+}
+
 /**
  * 
  * @param {Pos} pos1 
@@ -279,4 +302,22 @@ export function getTypeColor(type) {
         default:
             return "rgb(255, 255, 255)";
     }
+}
+/**
+ * 指定した座標が中心になるように文字を描画する
+ * @param {string} text
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number|Pos} x
+ * @param {number} y
+ * @returns {number[]} - 描画した座標
+ */
+export function renderTextToCenterPos(text,ctx,x,y=0){
+    if(x instanceof Pos){
+        [x,y] = x.getPos();
+    }
+    let txt = ctx.measureText(text);
+    let width = txt.width;
+    let render_x = x - (width/2);
+    ctx.strokeText(text,render_x,y);
+    return [render_x,y];
 }

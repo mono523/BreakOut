@@ -3,6 +3,10 @@
  * (c) 2021 mono / Gabuniku
  */
 // @ts-check
+
+import * as util from "./util.js"
+import { Ball } from "./ball.js"
+
 //メインファイル
 
 //変数たち
@@ -13,6 +17,12 @@ var CANVAS_CONTEXT;
 var GAME_FLAG = false;
 /** @type {boolean} - 初期化フラグ */
 var INIT_FLAG = false;
+/** @type {Array<Ball>} */
+const BALLS = [];
+/** @type {util.Clock} */
+const CLOCK = new util.Clock(60);
+/** @type {util.Rect} */
+const  STAGE_RECT = new util.Rect(new util.Pos(0,0),0,0);
 /** @type {object} - 入力の状態*/
 const KeyStatus = {
     /** @type {boolean} */
@@ -23,7 +33,24 @@ const KeyStatus = {
     Left: false,
     /** @type {boolean} */
     Right: false,
+    /** @type {boolean} */
+    Shot: false
 };
+/** @type {object} - ゲームの状態*/
+const GAME_STATUS_ENUM = {
+    /** @type {number} */
+    LOAD: 0,
+    /** @type {number} */
+    TITLE: 1,
+    /** @type {number} */
+    STAGE_SELECT: 2,
+    /** @type {number} */
+    GAME: 3,
+    /** @type {number} */
+    GAME_OVER: 4
+};
+/** @type {number} */
+var GAME_STATUS = 0;
 
 /**
  * キーボードが押されたときに呼ばれる
@@ -47,6 +74,10 @@ function KeyDown(evt) {
         case "Right":
         case "ArrowRight":
             KeyStatus.Right = true;
+            break;
+        case "z":
+        case "Z":
+            KeyStatus.Shot = true;
             break;
     }
 }
@@ -73,20 +104,66 @@ function KeyUp(evt) {
         case "ArrowRight":
             KeyStatus.Right = false;
             break;
+        case "z":
+        case "Z":
+            KeyStatus.Shot = false;
+            break;
     }
 }
+/**
+ * キー入力の状態をリセット
+ */
+function KeyReset() {
+    KeyStatus.Up = false;
+    KeyStatus.Down = false;
+    KeyStatus.Left = false
+    KeyStatus.Right = false;
+    KeyStatus.Shot = false;
+}
 
+
+function Title() { 
+    CANVAS_CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
+    CANVAS_CONTEXT.fillStyle = "rgb(0,0,0)";
+    CANVAS_CONTEXT.fillRect(0, 0, CANVAS.width, CANVAS.height);
+    CANVAS_CONTEXT.strokeStyle = "rgb(255,255,255)";
+    CANVAS_CONTEXT.font = "50px メイリオ";
+    util.renderTextToCenterPos("Break Out",CANVAS_CONTEXT,250,100);
+    util.renderTextToCenterPos("ブロック崩し",CANVAS_CONTEXT,250,150);
+    CANVAS_CONTEXT.font = "30px メイリオ";
+    util.renderTextToCenterPos("ショットキーを押して開始",CANVAS_CONTEXT,250,430);
+    if(KeyStatus.Shot){
+        GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
+    }
+}
 /**
  * 描画関数
  */
-function Render(){}
+function Render() { }
 
 
 /**
  * メインループ
  */
-function MainLoop() { }
-
+function MainLoop() {
+    switch (GAME_STATUS) {
+        case GAME_STATUS_ENUM.LOAD:
+            break;
+        case GAME_STATUS_ENUM.TITLE:
+            Title();
+            break;
+        case GAME_STATUS_ENUM.STAGE_SELECT:
+            CANVAS_CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
+            break;
+        case GAME_STATUS_ENUM.GAME:
+            break;
+        case GAME_STATUS_ENUM.GAME_OVER:
+            break;
+        default:
+            break;
+    }
+    setTimeout(MainLoop, 16.66);
+}
 
 /**
  * 初期化
@@ -94,10 +171,15 @@ function MainLoop() { }
  */
 function Init() {
     CANVAS = document.getElementById("canvas");
+    // @ts-ignore
     CANVAS_CONTEXT = CANVAS.getContext("2d");
     if (CANVAS_CONTEXT == undefined) {
         return false;
     }
+    // @ts-ignore
+    STAGE_RECT.setSize(CANVAS.width, CANVAS.height);
+    document.addEventListener("keydown",KeyDown);
+    document.addEventListener("keyup",KeyUp);
     return true;
 }
 /**
@@ -105,7 +187,9 @@ function Init() {
  */
 window.onload = function () {
     INIT_FLAG = Init();
-    if (INIT_FLAG) {
-        alert("初期化してください")
+    if (!INIT_FLAG) {
+        alert("初期化に失敗しました")
     }
+    GAME_STATUS = GAME_STATUS_ENUM.TITLE;
+    MainLoop();
 }
