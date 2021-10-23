@@ -18,12 +18,20 @@ export class Ball extends Entity {
      * @param {number} type - 種類
      */
     constructor(pos, angle, size, type) {
-        super(pos, new util.Rect(pos.copy(), size, size), angle, 5);
+        super(pos, new util.Rect(pos.copy(), size, size), angle, 10);
         this.type = type;
         this.size = size;
     }
     update() {
-        this.go_forward();
+        this.goForward();
+        if(this.pos.x <= 0 || this.pos.x >= 500){
+            let angle = util.getReflectAngle(this.angle,util.RectEdgeDirection.LEFT);
+            this.setAngle(angle);
+        }
+        if(this.pos.y <= 0){
+            let angle = util.getReflectAngle(this.angle,util.RectEdgeDirection.UP);
+            this.setAngle(angle);
+        }
         super.update();
     }
     /**
@@ -33,10 +41,9 @@ export class Ball extends Entity {
     render(ctx) {
         let old_style = ctx.fillStyle;
         ctx.fillStyle = util.getTypeColor(this.type);
-        ctx.beginPath()
+        ctx.beginPath();
         ctx.arc(this.pos.x, this.pos.y, this.size, 0, Math.PI * 2, true);
-        ctx.fill()
+        ctx.fill();
         ctx.fillStyle = old_style;
-
     }
 }

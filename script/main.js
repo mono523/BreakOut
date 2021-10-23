@@ -6,8 +6,41 @@
 
 import * as util from "./util.js"
 import { Ball } from "./ball.js"
+import { Entity } from "./entity.js";
 
 //メインファイル
+
+// クラス
+
+class Paddle extends Entity {
+    /**
+     * 
+     * @param {util.Pos} pos 
+     * @param {number} size 
+     */
+    constructor(pos, size) {
+        super(pos, new util.Rect(pos.copy(), size, 10));
+        this.rect.setCenter(pos.copy());
+    }
+    update() {
+        if (KeyStatus.Left) {
+            if (this.pos.x - this.speed > 0) {
+                this.pos.move(-this.speed, 0);
+            }
+        }
+        if (KeyStatus.Right) {
+            if (this.pos.x + this.rect.width + this.speed < CANVAS.width) {
+                this.pos.move(this.speed, 0);
+            }
+        }
+        if (KeyStatus.Shot) {
+            let pos = this.rect.getCenter();
+            pos.move(0,-10)
+            BALLS.push(new Ball(pos, -45, 10, 0));
+        }
+        super.update();
+    }
+}
 
 //変数たち
 var CANVAS;
@@ -17,12 +50,14 @@ var CANVAS_CONTEXT;
 var GAME_FLAG = false;
 /** @type {boolean} - 初期化フラグ */
 var INIT_FLAG = false;
+/** @type {number} */
+var frame_count = 0;
 /** @type {Array<Ball>} */
 const BALLS = [];
 /** @type {util.Clock} */
 const CLOCK = new util.Clock(60);
 /** @type {util.Rect} */
-const  STAGE_RECT = new util.Rect(new util.Pos(0,0),0,0);
+const STAGE_RECT = new util.Rect(new util.Pos(0, 0), 0, 0);
 /** @type {object} - 入力の状態*/
 const KeyStatus = {
     /** @type {boolean} */
@@ -52,13 +87,17 @@ const GAME_STATUS_ENUM = {
 /** @type {number} */
 var GAME_STATUS = 0;
 
+let PADDLE = new Paddle(new util.Pos(200, 450), 100);
+
+
+
 /**
  * キーボードが押されたときに呼ばれる
  * @param {KeyboardEvent} evt 
  */
 function KeyDown(evt) {
     //押されたキーの判別
-    switch (evt.key) {
+    switch (evt.code) {
         case "Up":
         case "ArrowUp":
             KeyStatus.Up = true;
@@ -75,8 +114,7 @@ function KeyDown(evt) {
         case "ArrowRight":
             KeyStatus.Right = true;
             break;
-        case "z":
-        case "Z":
+        case "Space":
             KeyStatus.Shot = true;
             break;
     }
@@ -87,7 +125,7 @@ function KeyDown(evt) {
  */
 function KeyUp(evt) {
     // 離されたキーの判別
-    switch (evt.key) {
+    switch (evt.code) {
         case "Up":
         case "ArrowUp":
             KeyStatus.Up = false;
@@ -104,8 +142,7 @@ function KeyUp(evt) {
         case "ArrowRight":
             KeyStatus.Right = false;
             break;
-        case "z":
-        case "Z":
+        case "Space":
             KeyStatus.Shot = false;
             break;
     }
@@ -121,25 +158,84 @@ function KeyReset() {
     KeyStatus.Shot = false;
 }
 
+/**
+ * タイトル画面
+ */
+function Title() {
 
-function Title() { 
-    CANVAS_CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
-    CANVAS_CONTEXT.fillStyle = "rgb(0,0,0)";
-    CANVAS_CONTEXT.fillRect(0, 0, CANVAS.width, CANVAS.height);
-    CANVAS_CONTEXT.strokeStyle = "rgb(255,255,255)";
-    CANVAS_CONTEXT.font = "50px メイリオ";
-    util.renderTextToCenterPos("Break Out",CANVAS_CONTEXT,250,100);
-    util.renderTextToCenterPos("ブロック崩し",CANVAS_CONTEXT,250,150);
-    CANVAS_CONTEXT.font = "30px メイリオ";
-    util.renderTextToCenterPos("ショットキーを押して開始",CANVAS_CONTEXT,250,430);
-    if(KeyStatus.Shot){
-        GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
-    }
 }
+
+function StageSelect() {
+    GAME_FLAG = true;
+    frame_count = 0;
+    KeyReset();
+    GAME_STATUS = GAME_STATUS_ENUM.GAME;
+}
+
+/**
+ * ゲーム状態
+ */
+function Game() {
+    if (frame_count == 0) {
+        // 初期化
+        PADDLE = new Paddle(new util.Pos(225, 450), 100);
+    }
+    PADDLE.update();
+    for (let index = 0; index < BALLS.length; index++) {
+        const ball = BALLS[index];
+        ball.update();
+        if (ball.pos.y > CANVAS.height) {
+            BALLS.splice(index, 1); //削除
+            continue;
+        }
+        let edge = ball.rect.getCollisionEdge(PADDLE.rect);
+        if(edge != util.RectEdgeDirection.NONE){
+            ball.setAngle(util.getReflectAngle(ball.angle,edge));            
+        }
+    }
+
+
+}
+
 /**
  * 描画関数
  */
-function Render() { }
+function Render() {
+    CANVAS_CONTEXT.fillStyle = "rgb(0,0,0)";
+    CANVAS_CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
+    CANVAS_CONTEXT.fillRect(0, 0, CANVAS.width, CANVAS.height);
+    switch (GAME_STATUS) {
+        case GAME_STATUS_ENUM.TITLE:
+            CANVAS_CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
+            CANVAS_CONTEXT.fillStyle = "rgb(0,0,0)";
+            CANVAS_CONTEXT.fillRect(0, 0, CANVAS.width, CANVAS.height);
+            CANVAS_CONTEXT.strokeStyle = "rgb(255,255,255)";
+            CANVAS_CONTEXT.font = "50px メイリオ";
+            util.renderTextToCenterPos("Break Out", CANVAS_CONTEXT, 250, 100);
+            util.renderTextToCenterPos("ブロック崩し", CANVAS_CONTEXT, 250, 150);
+            CANVAS_CONTEXT.font = "30px メイリオ";
+            util.renderTextToCenterPos("ショットキーを押して開始", CANVAS_CONTEXT, 250, 430);
+            if (KeyStatus.Shot) {
+                GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
+            }
+        case GAME_STATUS_ENUM.STAGE_SELECT:
+            break;
+        case GAME_STATUS_ENUM.GAME:
+            frame_count++;
+            CANVAS_CONTEXT.fillStyle = "rgb(0,255,255)";
+            for (let index = 0; index < BALLS.length; index++) {
+                const ball = BALLS[index];
+                ball.render(CANVAS_CONTEXT);
+            }
+            CANVAS_CONTEXT.fillStyle = "rgb(255,255,255)";
+            PADDLE.render(CANVAS_CONTEXT);
+            break;
+        case GAME_STATUS_ENUM.GAME_OVER:
+            break;
+        default:
+            break;
+    }
+}
 
 
 /**
@@ -153,15 +249,18 @@ function MainLoop() {
             Title();
             break;
         case GAME_STATUS_ENUM.STAGE_SELECT:
-            CANVAS_CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
+            StageSelect();
             break;
         case GAME_STATUS_ENUM.GAME:
+            Game();
+            frame_count++;
             break;
         case GAME_STATUS_ENUM.GAME_OVER:
             break;
         default:
             break;
     }
+    Render();
     setTimeout(MainLoop, 16.66);
 }
 
@@ -178,8 +277,8 @@ function Init() {
     }
     // @ts-ignore
     STAGE_RECT.setSize(CANVAS.width, CANVAS.height);
-    document.addEventListener("keydown",KeyDown);
-    document.addEventListener("keyup",KeyUp);
+    document.addEventListener("keydown", KeyDown);
+    document.addEventListener("keyup", KeyUp);
     return true;
 }
 /**

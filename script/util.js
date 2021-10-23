@@ -50,7 +50,7 @@ export class Pos {
      */
     move(x, y) {
         this.x += x;
-        this.y = +y;
+        this.y += y;
     }
 }
 // 当たった辺を表す列挙
@@ -139,8 +139,8 @@ export class Rect {
         let rect1_half = rect.getHalfSize();
         let rect_pos = this.getCenter();
         let rect1_pos = rect.getCenter();
-        let diff_x = Math.abs(rect_pos[0] - rect1_pos[0]) // X座標の差
-        let diff_y = Math.abs(rect_pos[1] - rect1_pos[1]) // Y座標の差
+        let diff_x = Math.abs(rect_pos.x - rect1_pos.x);// X座標の差
+        let diff_y = Math.abs(rect_pos.y - rect1_pos.y); // Y座標の差
         if ((rect_half[0] + rect1_half[0]) >= diff_x && (rect_half[1] + rect1_half[1]) >= diff_y) {
             return true;
         } else {
@@ -187,12 +187,12 @@ export class Rect {
     }
 }
 
-export class Clock{
+export class Clock {
     /**
      * フレーム管理など行うクラス
      * @param {number} fps 
      */
-    constructor(fps){
+    constructor(fps) {
         this.fps = fps;
         this.last_tick = 0;
         this.last_call_time = performance.now();
@@ -201,7 +201,7 @@ export class Clock{
      * calc tick
      * @returns {number} - 前回の呼び出しからのtick
      */
-    tick(){
+    tick() {
         let time = performance.now();
         this.last_tick = time - this.last_call_time;
         this.last_call_time = time;
@@ -311,13 +311,13 @@ export function getTypeColor(type) {
  * @param {number} y
  * @returns {number[]} - 描画した座標
  */
-export function renderTextToCenterPos(text,ctx,x,y=0){
-    if(x instanceof Pos){
-        [x,y] = x.getPos();
+export function renderTextToCenterPos(text, ctx, x, y = 0) {
+    if (x instanceof Pos) {
+        [x, y] = x.getPos();
     }
     let txt = ctx.measureText(text);
     let width = txt.width;
-    let render_x = x - (width/2);
-    ctx.strokeText(text,render_x,y);
-    return [render_x,y];
+    let render_x = x - (width / 2);
+    ctx.strokeText(text, render_x, y);
+    return [render_x, y];
 }
