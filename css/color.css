@@ -1,0 +1,15 @@
+body {
+    background-color: #d3d3d3;
+  }
+.BackGroundText {
+    background-color: #ffffff;
+    border: 1px solid #000000;
+}
+.BackGroundScreen {
+    background-color: #ffffff;
+    border: 3px solid #000000;
+}
+.welcome{
+    color: #7fbfff;
+    text-shadow:3px 3px 2px #3d3d3d;
+}
