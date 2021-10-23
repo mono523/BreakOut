@@ -19,7 +19,8 @@ class Paddle extends Entity {
      * @param {number} size 
      */
     constructor(pos, size) {
-        super(pos, new util.Rect(pos.copy(), size, 40));
+        super(pos, new util.Rect(pos.copy(), size, 10));
+        this.rect.setCenter(pos.copy());
     }
     update() {
         if (KeyStatus.Left) {
@@ -31,6 +32,11 @@ class Paddle extends Entity {
             if (this.pos.x + this.rect.width + this.speed < CANVAS.width) {
                 this.pos.move(this.speed, 0);
             }
+        }
+        if (KeyStatus.Shot) {
+            let pos = this.rect.getCenter();
+            pos.move(0,-10)
+            BALLS.push(new Ball(pos, -45, 10, 0));
         }
         super.update();
     }
@@ -81,7 +87,7 @@ const GAME_STATUS_ENUM = {
 /** @type {number} */
 var GAME_STATUS = 0;
 
-let PADDLE = new Paddle(new util.Pos(225, 450), 100);
+let PADDLE = new Paddle(new util.Pos(200, 450), 100);
 
 
 
@@ -156,24 +162,14 @@ function KeyReset() {
  * タイトル画面
  */
 function Title() {
-    CANVAS_CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
-    CANVAS_CONTEXT.fillStyle = "rgb(0,0,0)";
-    CANVAS_CONTEXT.fillRect(0, 0, CANVAS.width, CANVAS.height);
-    CANVAS_CONTEXT.strokeStyle = "rgb(255,255,255)";
-    CANVAS_CONTEXT.font = "50px メイリオ";
-    util.renderTextToCenterPos("Break Out", CANVAS_CONTEXT, 250, 100);
-    util.renderTextToCenterPos("ブロック崩し", CANVAS_CONTEXT, 250, 150);
-    CANVAS_CONTEXT.font = "30px メイリオ";
-    util.renderTextToCenterPos("ショットキーを押して開始", CANVAS_CONTEXT, 250, 430);
-    if (KeyStatus.Shot) {
-        GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
-    }
+
 }
 
 function StageSelect() {
     GAME_FLAG = true;
     frame_count = 0;
     KeyReset();
+    GAME_STATUS = GAME_STATUS_ENUM.GAME;
 }
 
 /**
@@ -182,15 +178,64 @@ function StageSelect() {
 function Game() {
     if (frame_count == 0) {
         // 初期化
-
+        PADDLE = new Paddle(new util.Pos(225, 450), 100);
     }
+    PADDLE.update();
+    for (let index = 0; index < BALLS.length; index++) {
+        const ball = BALLS[index];
+        ball.update();
+        if (ball.pos.y > CANVAS.height) {
+            BALLS.splice(index, 1); //削除
+            continue;
+        }
+        let edge = ball.rect.getCollisionEdge(PADDLE.rect);
+        if(edge != util.RectEdgeDirection.NONE){
+            ball.setAngle(util.getReflectAngle(ball.angle,edge));            
+        }
+    }
+
 
 }
 
 /**
  * 描画関数
  */
-function Render() { }
+function Render() {
+    CANVAS_CONTEXT.fillStyle = "rgb(0,0,0)";
+    CANVAS_CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
+    CANVAS_CONTEXT.fillRect(0, 0, CANVAS.width, CANVAS.height);
+    switch (GAME_STATUS) {
+        case GAME_STATUS_ENUM.TITLE:
+            CANVAS_CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
+            CANVAS_CONTEXT.fillStyle = "rgb(0,0,0)";
+            CANVAS_CONTEXT.fillRect(0, 0, CANVAS.width, CANVAS.height);
+            CANVAS_CONTEXT.strokeStyle = "rgb(255,255,255)";
+            CANVAS_CONTEXT.font = "50px メイリオ";
+            util.renderTextToCenterPos("Break Out", CANVAS_CONTEXT, 250, 100);
+            util.renderTextToCenterPos("ブロック崩し", CANVAS_CONTEXT, 250, 150);
+            CANVAS_CONTEXT.font = "30px メイリオ";
+            util.renderTextToCenterPos("ショットキーを押して開始", CANVAS_CONTEXT, 250, 430);
+            if (KeyStatus.Shot) {
+                GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
+            }
+        case GAME_STATUS_ENUM.STAGE_SELECT:
+            break;
+        case GAME_STATUS_ENUM.GAME:
+            frame_count++;
+            CANVAS_CONTEXT.fillStyle = "rgb(0,255,255)";
+            for (let index = 0; index < BALLS.length; index++) {
+                const ball = BALLS[index];
+                ball.render(CANVAS_CONTEXT);
+            }
+            CANVAS_CONTEXT.fillStyle = "rgb(255,255,255)";
+            PADDLE.render(CANVAS_CONTEXT);
+            break;
+        case GAME_STATUS_ENUM.GAME_OVER:
+            break;
+        default:
+            break;
+    }
+}
 
 
 /**
@@ -204,7 +249,7 @@ function MainLoop() {
             Title();
             break;
         case GAME_STATUS_ENUM.STAGE_SELECT:
-            CANVAS_CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
+            StageSelect();
             break;
         case GAME_STATUS_ENUM.GAME:
             Game();
@@ -215,6 +260,7 @@ function MainLoop() {
         default:
             break;
     }
+    Render();
     setTimeout(MainLoop, 16.66);
 }
 
