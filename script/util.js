@@ -79,7 +79,7 @@ export class Rect {
      * セッター
      * @param {Pos} pos 
      */
-    setPos(pos){
+    setPos(pos) {
         this.pos = pos;
     }
     /**
@@ -96,9 +96,9 @@ export class Rect {
      * Rectの各数値を返す
      * @returns {number[]}
      */
-    getRectParam(){
-        return [this.pos.x,this.pos.y,this.width,this.height];
-        }
+    getRectParam() {
+        return [this.pos.x, this.pos.y, this.width, this.height];
+    }
 
     /**
      * Rectの中心座標のPosを返す
@@ -177,6 +177,13 @@ export class Rect {
                 return RectEdgeDirection.UP;
             }
         }
+    }
+    /**
+     * コピー
+     * @returns {Rect}
+     */
+    copy() {
+        return new Rect(this.pos.copy(), this.width, this.height);
     }
 }
 /**
