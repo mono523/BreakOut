@@ -119,8 +119,12 @@ function KeyReset() {
     KeyStatus.Shot = false;
 }
 
-function Title(){}
 
+function Title() { 
+    CANVAS_CONTEXT.clearRect(0, 0, CANVAS.width, CANVAS.height);
+    CANVAS_CONTEXT.font = "40px";
+    util.renderTextToCenterPos("Break Out",CANVAS_CONTEXT,250,100);
+}
 /**
  * 描画関数
  */
@@ -146,8 +150,8 @@ function MainLoop() {
         default:
             break;
     }
+    setTimeout(MainLoop, 16.66);
 }
-
 
 /**
  * 初期化
@@ -167,7 +171,10 @@ function Init() {
  */
 window.onload = function () {
     INIT_FLAG = Init();
-    if (INIT_FLAG) {
-        alert("初期化してください")
+    if (!INIT_FLAG) {
+        alert("初期化に失敗しました")
     }
+    GAME_STATUS = GAME_STATUS_ENUM.TITLE;
+    MainLoop();
+
 }
