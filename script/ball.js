@@ -24,6 +24,14 @@ export class Ball extends Entity {
     }
     update() {
         this.goForward();
+        if(this.pos.x <= 0 || this.pos.x >= 500){
+            let angle = util.getReflectAngle(this.angle,util.RectEdgeDirection.LEFT);
+            this.setAngle(angle);
+        }
+        if(this.pos.y <= 0){
+            let angle = util.getReflectAngle(this.angle,util.RectEdgeDirection.UP);
+            this.setAngle(angle);
+        }
         super.update();
     }
     /**
@@ -33,10 +41,9 @@ export class Ball extends Entity {
     render(ctx) {
         let old_style = ctx.fillStyle;
         ctx.fillStyle = util.getTypeColor(this.type);
-        ctx.beginPath()
+        ctx.beginPath();
         ctx.arc(this.pos.x, this.pos.y, this.size, 0, Math.PI * 2, true);
-        ctx.fill()
+        ctx.fill();
         ctx.fillStyle = old_style;
-
     }
 }
