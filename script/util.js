@@ -139,8 +139,8 @@ export class Rect {
         let rect1_half = rect.getHalfSize();
         let rect_pos = this.getCenter();
         let rect1_pos = rect.getCenter();
-        let diff_x = Math.abs(rect_pos[0] - rect1_pos[0]) // X座標の差
-        let diff_y = Math.abs(rect_pos[1] - rect1_pos[1]) // Y座標の差
+        let diff_x = Math.abs(rect_pos.x - rect1_pos.x);// X座標の差
+        let diff_y = Math.abs(rect_pos.y - rect1_pos.y); // Y座標の差
         if ((rect_half[0] + rect1_half[0]) >= diff_x && (rect_half[1] + rect1_half[1]) >= diff_y) {
             return true;
         } else {
