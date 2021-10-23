@@ -3,4 +3,12 @@
 }
 .text {
     text-align: center;
+    font-size: 20px;
+}
+.BackGroundText {
+    margin: 40px auto;
+}
+.BackGroundScreen {
+    padding: 15px;
+    margin: auto;
 }
