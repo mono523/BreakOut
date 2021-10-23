@@ -77,12 +77,27 @@ export class Rect {
     }
     /**
      * セッター
+     * @param {Pos} pos 
+     */
+    setPos(pos) {
+        this.pos = pos;
+    }
+    /**
+     * セッター
      * @param {number} width 
      * @param {number} height 
      */
     setSize(width, height) {
         this.width = width;
         this.height = height
+    }
+
+    /**
+     * Rectの各数値を返す
+     * @returns {number[]}
+     */
+    getRectParam() {
+        return [this.pos.x, this.pos.y, this.width, this.height];
     }
 
     /**
@@ -163,6 +178,13 @@ export class Rect {
             }
         }
     }
+    /**
+     * コピー
+     * @returns {Rect}
+     */
+    copy() {
+        return new Rect(this.pos.copy(), this.width, this.height);
+    }
 }
 /**
  * 
@@ -211,5 +233,50 @@ export function getReflectAngle(angle, edge = RectEdgeDirection.NONE) {
             return 360 - angle;
         default:
             return angle;
+    }
+}
+
+export const COLOR_TYPE = {
+    WHITE: 0,
+    BLACK: 1,
+    RED: 2,
+    ORANGE: 3,
+    YELLOW: 4,
+    GREEN: 5,
+    YELLOW_GREEN: 6,
+    BLUE: 7,
+    PURPLE: 8,
+    PINK: 9,
+};
+
+/**
+ * colorを返す
+ * @param {number} type 
+ * @returns {string}
+ */
+export function getTypeColor(type) {
+    switch (type) {
+        case COLOR_TYPE.WHITE:
+            return "rgb(255, 255, 255)";
+        case COLOR_TYPE.BLACK:
+            return "rgb(0, 0, 0)";
+        case COLOR_TYPE.RED:
+            return "rgb(255, 0, 0)";
+        case COLOR_TYPE.ORANGE:
+            return "rgb(255, 150, 255)";
+        case COLOR_TYPE.YELLOW:
+            return "rgb(255, 255, 0)";
+        case COLOR_TYPE.GREEN:
+            return "rgb(0, 255, 0)";
+        case COLOR_TYPE.YELLOW_GREEN:
+            return "rgb(0, 255, 150)";
+        case COLOR_TYPE.BLUE:
+            return "rgb(0, 0, 255)";
+        case COLOR_TYPE.PURPLE:
+            return "rgb(150, 0, 255)";
+        case COLOR_TYPE.PINK:
+            return "rgb(255, 0, 255)";
+        default:
+            return "rgb(255, 255, 255)";
     }
 }
