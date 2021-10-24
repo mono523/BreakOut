@@ -40,7 +40,7 @@ export class Entity {
      * 毎フレーム呼ぶこと
      */
     update() {
-        this.rect.setPos(this.pos.copy());
+        this.rect.setCenter(this.pos.copy());
         this.frame_count++;
     }
     /**

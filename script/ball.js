@@ -39,7 +39,7 @@ export class Ball extends Entity {
      * 
      * @param {util.Rect} rect - paddle rect
      */
-    collisionPaddle(rect) {
+    collision(rect) {
         let edge = this.rect.getCollisionAndFix(rect);
         if (edge != util.RectEdgeDirection.NONE) {
             let pos = this.rect.pos.copy();

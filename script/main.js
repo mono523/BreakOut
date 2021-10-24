@@ -20,23 +20,24 @@ class Paddle extends Entity {
      */
     constructor(pos, size) {
         super(pos, new util.Rect(pos.copy(), size, 10));
+        this.size = size;
         this.rect.setCenter(pos.copy());
     }
     update() {
         if (KeyStatus.Left) {
-            if (this.pos.x - this.speed > 0) {
+            if (this.pos.x - (this.rect.width / 2) - this.speed >= 0) {
                 this.pos.move(-this.speed, 0);
             }
         }
         if (KeyStatus.Right) {
-            if (this.pos.x + this.rect.width + this.speed < CANVAS.width) {
+            if (this.pos.x + (this.rect.width / 2) + this.speed <= CANVAS.width) {
                 this.pos.move(this.speed, 0);
             }
         }
         if (KeyStatus.Shot) {
             let pos = this.rect.getCenter();
-            pos.move(0,-10)
-            BALLS.push(new Ball(pos, -45, 10, 0));
+            pos.move(0, -10)
+            BALLS.push(new Ball(pos, -45, 5, 0));
         }
         super.update();
     }
@@ -87,7 +88,7 @@ const GAME_STATUS_ENUM = {
 /** @type {number} */
 var GAME_STATUS = 0;
 
-let PADDLE = new Paddle(new util.Pos(200, 450), 100);
+let PADDLE = new Paddle(new util.Pos(250, 450), 100);
 
 
 
@@ -184,14 +185,11 @@ function Game() {
     for (let index = 0; index < BALLS.length; index++) {
         const ball = BALLS[index];
         ball.update();
-        if (ball.pos.y > CANVAS.height) {
+        if (ball.pos.y > CANVAS.height + 20) {
             BALLS.splice(index, 1); //削除
             continue;
         }
-        let edge = ball.rect.getCollisionEdge(PADDLE.rect);
-        if(edge != util.RectEdgeDirection.NONE){
-            ball.setAngle(util.getReflectAngle(ball.angle,edge));            
-        }
+        ball.collision(PADDLE.rect);
     }
 
 

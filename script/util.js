@@ -241,11 +241,7 @@ export class Rect {
                 off_y = 0;
                 break;
         }
-        console.log(result.colliEdge, result.collisionX * off_x, result.collisionY * off_y)
-        console.log(result.collisionX, result.collisionY)
-
         this.pos.move(result.collisionX * off_x, result.collisionY * off_y);
-
         return result.colliEdge;
     }
     /**
