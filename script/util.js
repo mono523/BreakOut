@@ -377,13 +377,17 @@ export function getTypeColor(type) {
  * @param {number} y
  * @returns {number[]} - 描画した座標
  */
-export function renderTextToCenterPos(text, ctx, x, y = 0) {
+export function renderTextToCenterPos(text, ctx, x, y = 0, fill = false) {
     if (x instanceof Pos) {
         [x, y] = x.getPos();
     }
     let txt = ctx.measureText(text);
     let width = txt.width;
     let render_x = x - (width / 2);
-    ctx.strokeText(text, render_x, y);
+    if (fill) {
+        ctx.fillText(text, render_x, y);
+    } else {
+        ctx.strokeText(text, render_x, y);
+    }
     return [render_x, y];
 }
