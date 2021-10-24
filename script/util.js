@@ -352,7 +352,7 @@ export function getTypeColor(type) {
         case COLOR_TYPE.RED:
             return "rgb(255, 0, 0)";
         case COLOR_TYPE.ORANGE:
-            return "rgb(255, 150, 255)";
+            return "rgb(255, 100, 0)";
         case COLOR_TYPE.YELLOW:
             return "rgb(255, 255, 0)";
         case COLOR_TYPE.GREEN:
