@@ -150,9 +150,11 @@ export class Rect {
     /**
      * 衝突している辺を求める
      * @param {Rect} rect
+     * @param {boolean} fix - めり込み補正をするか (めり込み補正は自身にする)
+     * @param {number} angle - 補正時に使用
      * @returns {number}
      */
-    getCollisionEdge(rect) {
+    getCollisionEdge(rect,fix=true,angle=0) {
         if (!this.getCollision(rect)) {
             return RectEdgeDirection.NONE;
         }
@@ -160,10 +162,14 @@ export class Rect {
         let rect1_half = rect.getHalfSize();
         let rect_pos = this.getCenter();
         let rect1_pos = rect.getCenter();
-        let diff_x = Math.abs(rect_pos[0] - rect1_pos[0]);// X座標の差
-        let diff_y = Math.abs(rect_pos[1] - rect1_pos[1]); // Y座標の差
+        let diff_x = Math.abs(rect_pos.x - rect1_pos.x);// X座標の差
+        let diff_y = Math.abs(rect_pos.y - rect1_pos.y); // Y座標の差
         let collision_x = diff_x - (rect_half[0] + rect1_half[0]); //重なっている辺の長さ
         let collision_y = diff_y - (rect_half[1] + rect1_half[1]);
+        if(fix){
+            console.log(collision_x)
+            this.pos.move(collision_x,-50);
+        }
         if (collision_x > collision_y) {
             if ((rect.pos.x - this.pos.x) > 0) {//自分が左側 -> 右の辺
                 return RectEdgeDirection.RIGHT;
