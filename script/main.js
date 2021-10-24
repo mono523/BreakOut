@@ -7,6 +7,8 @@
 import * as util from "./util.js"
 import { Ball } from "./ball.js"
 import { Entity } from "./entity.js";
+import { Block } from "./block.js";
+import { BuildStage, STAGES } from "./stage.js";
 
 //メインファイル
 
@@ -37,7 +39,7 @@ class Paddle extends Entity {
         if (KeyStatus.Shot) {
             let pos = this.rect.getCenter();
             pos.move(0, -10)
-            BALLS.push(new Ball(pos, -45, 5, 0));
+            BALLS.push(new Ball(pos, util.getRandomRange(-135, -45), 5, 0));
         }
         super.update();
     }
@@ -55,6 +57,8 @@ var INIT_FLAG = false;
 var frame_count = 0;
 /** @type {Array<Ball>} */
 const BALLS = [];
+/** @type {Array<Array<Block>>} */
+var BLOCKS = [];
 /** @type {util.Clock} */
 const CLOCK = new util.Clock(60);
 /** @type {util.Rect} */
@@ -87,6 +91,8 @@ const GAME_STATUS_ENUM = {
 };
 /** @type {number} */
 var GAME_STATUS = 0;
+/** @type {number} */
+var StageSelectIndex = 0;
 
 let PADDLE = new Paddle(new util.Pos(250, 450), 100);
 
@@ -163,7 +169,11 @@ function KeyReset() {
  * タイトル画面
  */
 function Title() {
-
+    frame_count++;
+    if (KeyStatus.Shot) {
+        GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
+        frame_count = 0;
+    }
 }
 
 function StageSelect() {
@@ -180,6 +190,9 @@ function Game() {
     if (frame_count == 0) {
         // 初期化
         PADDLE = new Paddle(new util.Pos(225, 450), 100);
+        // @ts-ignore
+        BLOCKS = BuildStage(STAGES[1].blocks);
+        console.log(BLOCKS)
     }
     PADDLE.update();
     for (let index = 0; index < BALLS.length; index++) {
@@ -190,6 +203,15 @@ function Game() {
             continue;
         }
         ball.collision(PADDLE.rect);
+        for (let row = 0; row < BLOCKS.length; row++) {
+            const ROW = BLOCKS[row];
+            for (let col = 0; col < ROW.length; col++) {
+                const block = ROW[col];
+                if (ball.collision(block.rect)) {
+                    ROW.splice(col, 1);
+                }
+            }
+        }
     }
 
 
@@ -211,19 +233,38 @@ function Render() {
             CANVAS_CONTEXT.font = "50px メイリオ";
             util.renderTextToCenterPos("Break Out", CANVAS_CONTEXT, 250, 100);
             util.renderTextToCenterPos("ブロック崩し", CANVAS_CONTEXT, 250, 150);
-            CANVAS_CONTEXT.font = "30px メイリオ";
-            util.renderTextToCenterPos("ショットキーを押して開始", CANVAS_CONTEXT, 250, 430);
-            if (KeyStatus.Shot) {
-                GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
+            if (Math.sin(frame_count*0.1) > 0) {
+                CANVAS_CONTEXT.font = "30px メイリオ";
+                util.renderTextToCenterPos("ショットキーを押して開始", CANVAS_CONTEXT, 250, 430);
             }
+            break;
         case GAME_STATUS_ENUM.STAGE_SELECT:
+
+            for (let index = 0; index < STAGES.length; index++) {
+                const stage = STAGES[index];
+                if (index == StageSelectIndex) {
+                    CANVAS_CONTEXT.fillStyle = "rgb(0, 255, 150)";
+                    CANVAS_CONTEXT.strokeStyle = "rgb(255, 0, 0)";
+                } else {
+                    CANVAS_CONTEXT.fillStyle = "rgb(150, 150, 150)";
+                    CANVAS_CONTEXT.strokeStyle = "rgb(255, 255, 255)";
+                }
+                CANVAS_CONTEXT.fillRect(175 + (200 * (StageSelectIndex - index)), 200, 150, 100);
+
+            }
             break;
         case GAME_STATUS_ENUM.GAME:
-            frame_count++;
             CANVAS_CONTEXT.fillStyle = "rgb(0,255,255)";
             for (let index = 0; index < BALLS.length; index++) {
                 const ball = BALLS[index];
                 ball.render(CANVAS_CONTEXT);
+            }
+            for (let row = 0; row < BLOCKS.length; row++) {
+                const ROW = BLOCKS[row];
+                for (let col = 0; col < ROW.length; col++) {
+                    const block = ROW[col];
+                    block.render(CANVAS_CONTEXT);
+                }
             }
             CANVAS_CONTEXT.fillStyle = "rgb(255,255,255)";
             PADDLE.render(CANVAS_CONTEXT);
