@@ -62,6 +62,18 @@ export const RectEdgeDirection = {
     NONE: 4
 };
 
+const CollisionResult = {
+    diffX: 0,
+    diffY: 0,
+    diffX_abs: 0,
+    diffY_abs: 0,
+    collisionY: 0,
+    collisionX: 0,
+    edgeXsize: 0,
+    edgeYsize: 0,
+    colliEdge: RectEdgeDirection.NONE
+};
+
 export class Rect {
 
     /**
@@ -150,12 +162,15 @@ export class Rect {
     /**
      * 衝突している辺を求める
      * @param {Rect} rect
-     * @param {boolean} fix - めり込み補正をするか (めり込み補正は自身にする)
-     * @param {number} angle - 補正時に使用
-     * @returns {number}
+     * @param {boolean} result - 結果を返すかどうか
+     * @returns {number|object}
      */
-    getCollisionEdge(rect,fix=true,angle=0) {
+    getCollisionEdge(rect, result = false) {
+        let res = { ...CollisionResult };
         if (!this.getCollision(rect)) {
+            if (result) {
+                return res;
+            }
             return RectEdgeDirection.NONE;
         }
         let rect_half = this.getHalfSize();
@@ -164,25 +179,74 @@ export class Rect {
         let rect1_pos = rect.getCenter();
         let diff_x = Math.abs(rect_pos.x - rect1_pos.x);// X座標の差
         let diff_y = Math.abs(rect_pos.y - rect1_pos.y); // Y座標の差
-        let collision_x = diff_x - (rect_half[0] + rect1_half[0]); //重なっている辺の長さ
-        let collision_y = diff_y - (rect_half[1] + rect1_half[1]);
-        if(fix){
-            console.log(collision_x)
-            this.pos.move(collision_x,-50);
-        }
+        let diff_x_abs = Math.abs(rect_pos.x - rect1_pos.x);// X座標の差絶対値
+        let diff_y_abs = Math.abs(rect_pos.y - rect1_pos.y); // Y座標の差絶対値
+        let edge_size_x = rect_half[0] + rect1_half[0];
+        let edge_size_y = rect_half[1] + rect1_half[1];
+        let collision_x = diff_x_abs - edge_size_x; //重なっている辺の長さ
+        let collision_y = diff_y_abs - edge_size_y;
+        let colliEdge = RectEdgeDirection.NONE;
+
         if (collision_x > collision_y) {
             if ((rect.pos.x - this.pos.x) > 0) {//自分が左側 -> 右の辺
-                return RectEdgeDirection.RIGHT;
+                colliEdge = RectEdgeDirection.RIGHT;
             } else {
-                return RectEdgeDirection.LEFT;
+                colliEdge = RectEdgeDirection.LEFT;
             }
         } else {
             if ((rect.pos.y - this.pos.y) > 0) {//自分が上 -> 下の辺
-                return RectEdgeDirection.DOWN;
+                colliEdge = RectEdgeDirection.DOWN;
             } else {
-                return RectEdgeDirection.UP;
+                colliEdge = RectEdgeDirection.UP;
             }
         }
+        if (result) {
+            res.diffX = diff_x;
+            res.diffY = diff_y;
+            res.diffX_abs = diff_x_abs;
+            res.diffY_abs = diff_y_abs;
+            res.collisionX = Math.abs(collision_x);
+            res.collisionY = Math.abs(collision_y);
+            res.colliEdge = colliEdge;
+            return res;
+        } else {
+            return colliEdge;
+        }
+    }
+    /**
+     * 当たり判定の検証とめり込み補正
+     * @param {Rect} rect 
+     */
+    getCollisionAndFix(rect) {
+        let result = this.getCollisionEdge(rect, true);
+        if (result.colliEdge == RectEdgeDirection.NONE) {
+            return result.colliEdge;
+        }
+        let off_x, off_y;
+        switch (result.colliEdge) {
+            case RectEdgeDirection.UP:
+                off_x = 0;
+                off_y = 1;
+                break;
+            case RectEdgeDirection.DOWN:
+                off_x = 0;
+                off_y = -1;
+                break;
+            case RectEdgeDirection.LEFT:
+                off_x = 1;
+                off_y = 0;
+                break;
+            case RectEdgeDirection.RIGHT:
+                off_x = -1;
+                off_y = 0;
+                break;
+        }
+        console.log(result.colliEdge, result.collisionX * off_x, result.collisionY * off_y)
+        console.log(result.collisionX, result.collisionY)
+
+        this.pos.move(result.collisionX * off_x, result.collisionY * off_y);
+
+        return result.colliEdge;
     }
     /**
      * コピー
