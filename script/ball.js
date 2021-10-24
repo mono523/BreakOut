@@ -24,15 +24,27 @@ export class Ball extends Entity {
     }
     update() {
         this.goForward();
-        if(this.pos.x <= 0 || this.pos.x >= 500){
-            let angle = util.getReflectAngle(this.angle,util.RectEdgeDirection.LEFT);
+        if (this.pos.x <= 0 || this.pos.x >= 500) {
+            let angle = util.getReflectAngle(this.angle, util.RectEdgeDirection.LEFT);
             this.setAngle(angle);
         }
-        if(this.pos.y <= 0){
-            let angle = util.getReflectAngle(this.angle,util.RectEdgeDirection.UP);
+        if (this.pos.y <= 0) {
+            let angle = util.getReflectAngle(this.angle, util.RectEdgeDirection.UP);
             this.setAngle(angle);
         }
         super.update();
+    }
+
+    /**
+     * 
+     * @param {util.Rect} rect - paddle rect
+     */
+    collisionPaddle(rect) {
+        let edge = this.rect.getCollisionAndFix(rect);
+        if (edge != util.RectEdgeDirection.NONE) {
+            let pos = this.rect.pos.copy();
+            this.setAngle(util.getReflectAngle(this.angle, edge));
+        }
     }
     /**
      * 描画
