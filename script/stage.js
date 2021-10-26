@@ -8,7 +8,7 @@ import { Pos, Rect } from "./util.js"
 import { Block } from "./block.js"
 
 /**
- * ブロックのグリッドは20x16とする
+ * ブロックのグリッドは25x16とする
  */
 export const BLOCK_SIZE = 20;
 export const GRID_SIZE = [25, 16];
@@ -22,9 +22,9 @@ const NormalStage = {
     blocks: fill_stage()
 };
 
-const KonamiStage = {
+export const KonamiStage = {
     name: "konami",
-    comment:"コナミさん許して(小並感)",
+    comment:"祝コナミコマンド35周年",
     blocks: [
         [],
         [-1, -1, -1, -1, -1, 10, 10, 10, 10, 10, 10, 13, 13, 13, 13, 10, 10, 10, 10, -1],
@@ -80,4 +80,4 @@ function fill_stage() {
     return arr;
 }
 
-export const STAGES = [NormalStage,KonamiStage];
+export const STAGES = [NormalStage];
