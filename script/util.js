@@ -391,3 +391,21 @@ export function renderTextToCenterPos(text, ctx, x, y = 0, fill = false) {
     }
     return [render_x, y];
 }
+
+/**
+ * 
+ * @param {Array} base - 求めたい配列
+ * @param {Array} target - 検証される方
+ * @returns {boolean}
+ */
+export function sameArray(base,target){
+    if(base.length != target.length){
+        return false;
+    }
+    for(let i =0;i<base.length;i++){
+        if(base[i]!=target[i]){
+            return false;
+        }
+    }
+    return true;
+}

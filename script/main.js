@@ -53,6 +53,8 @@ var CANVAS_CONTEXT;
 var GAME_FLAG = false;
 /** @type {boolean} - 初期化フラグ */
 var INIT_FLAG = false;
+/** @type {boolean} - ロードフラグ */
+var LOAD_FLAG = false;
 /** @type {number} */
 var frame_count = 0;
 /** @type {Array<Ball>} */
@@ -74,7 +76,9 @@ const KeyStatus = {
     /** @type {boolean} */
     Right: false,
     /** @type {boolean} */
-    Shot: false
+    Shot: false,
+    /** @type {boolean} */
+    Escape: false
 };
 /** @type {object} - ゲームの状態*/
 const GAME_STATUS_ENUM = {
@@ -93,11 +97,14 @@ const GAME_STATUS_ENUM = {
 var GAME_STATUS = 0;
 /** @type {number} */
 var StageSelectIndex = 0;
+/** @type {number} */
 var DestructibleBlockCount = 0; // ステージ上の消せるブロックの残り
 let PADDLE = new Paddle(new util.Pos(250, 450), 100);
 var ClearFrame = 0;
 var ClearFlag = false;
-
+var konami_flag = false;
+const CMD_LIST = [];
+const AudioData = {};
 
 /**
  * キーボードが押されたときに呼ばれる
@@ -109,22 +116,39 @@ function KeyDown(evt) {
         case "Up":
         case "ArrowUp":
             KeyStatus.Up = true;
+            CMD_LIST.push("U");
             break;
         case "Down":
         case "ArrowDown":
             KeyStatus.Down = true;
+            CMD_LIST.push("D");
             break;
         case "Left":
         case "ArrowLeft":
             KeyStatus.Left = true
+            CMD_LIST.push("L");
             break;
         case "Right":
         case "ArrowRight":
             KeyStatus.Right = true;
+            CMD_LIST.push("R");
             break;
         case "Space":
             KeyStatus.Shot = true;
             break;
+        case "Escape":
+            KeyStatus.Escape = true;
+            break;
+        case "KeyA":
+            CMD_LIST.push("A");
+            break;
+        case "KeyB":
+            CMD_LIST.push("B");
+            break;
+
+    }
+    if (CMD_LIST.length > 10) {
+        CMD_LIST.splice(0, 1)
     }
 }
 /**
@@ -153,6 +177,9 @@ function KeyUp(evt) {
         case "Space":
             KeyStatus.Shot = false;
             break;
+        case "Escape":
+            KeyStatus.Escape = false;
+            break;
     }
 }
 /**
@@ -164,6 +191,7 @@ function KeyReset() {
     KeyStatus.Left = false
     KeyStatus.Right = false;
     KeyStatus.Shot = false;
+    KeyStatus.Escape = false;
 }
 
 /**
@@ -173,6 +201,7 @@ function Title() {
     frame_count++;
     if (KeyStatus.Shot) {
         GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
+        SePlay(AudioData["hit"])
         KeyReset();
         frame_count = 0;
     }
@@ -194,6 +223,11 @@ function StageSelect() {
         if (StageSelectIndex < STAGES.length - 1) {
             StageSelectIndex++;
         }
+    }
+    if (KeyStatus.Escape) {
+        GAME_STATUS = GAME_STATUS_ENUM.TITLE;
+        KeyReset();
+        frame_count = 0;
     }
 
     KeyReset();
@@ -233,6 +267,13 @@ function Game() {
                 }
             }
         }
+        if (KeyStatus.Escape) {
+            GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
+            GAME_FLAG = false;
+            KeyReset();
+            frame_count = 0;
+        }
+    
     }
     if (DestructibleBlockCount == 0) {
         // クリア
@@ -270,6 +311,7 @@ function Render() {
             CANVAS_CONTEXT.font = "20px Impact";
             CANVAS_CONTEXT.fillStyle = "rgb(255,255,255)";
             util.renderTextToCenterPos("(c) 2021 mono / Gabuniku", CANVAS_CONTEXT, 250, 160, true);
+            util.renderTextToCenterPos(CMD_LIST, CANVAS_CONTEXT, 250, 200, true);
             if (Math.sin(frame_count * 0.1) > 0) {
                 CANVAS_CONTEXT.font = "40px Impact";
                 util.renderTextToCenterPos("- Press Shot Key -", CANVAS_CONTEXT, 250, 430);
@@ -334,6 +376,14 @@ function Render() {
 
 
 /**
+ * @param {{ currentTime: number; play: () => void; }} audio
+ */
+function SePlay(audio) {
+    audio.currentTime = 0;
+    audio.play();
+}
+
+/**
  * メインループ
  */
 function MainLoop() {
@@ -374,6 +424,8 @@ function Init() {
     STAGE_RECT.setSize(CANVAS.width, CANVAS.height);
     document.addEventListener("keydown", KeyDown);
     document.addEventListener("keyup", KeyUp);
+    AudioData["hit"] = document.getElementById("se_hit");
+    AudioData["gradius"] = document.getElementById("se_gradius");
     return true;
 }
 /**

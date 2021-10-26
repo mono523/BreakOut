@@ -8,7 +8,7 @@ import { Pos, Rect } from "./util.js"
 import { Block } from "./block.js"
 
 /**
- * ブロックのグリッドは20x16とする
+ * ブロックのグリッドは25x16とする
  */
 export const BLOCK_SIZE = 20;
 export const GRID_SIZE = [25, 16];
