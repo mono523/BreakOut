@@ -8,7 +8,7 @@ import * as util from "./util.js"
 import { Ball } from "./ball.js"
 import { Entity } from "./entity.js";
 import { Block } from "./block.js";
-import { BuildStage, STAGES } from "./stage.js";
+import { BuildStage, KonamiStage, STAGES } from "./stage.js";
 
 //メインファイル
 
@@ -205,6 +205,13 @@ function Title() {
         KeyReset();
         frame_count = 0;
     }
+    if(!konami_flag){
+        if(util.sameArray(["U","U","D","D","L","R","L","R","B","A"],CMD_LIST)){
+            konami_flag = true;
+            SePlay(AudioData["gradius"]);
+            STAGES.push(KonamiStage);
+        }
+    }
 }
 
 function StageSelect() {
@@ -311,7 +318,6 @@ function Render() {
             CANVAS_CONTEXT.font = "20px Impact";
             CANVAS_CONTEXT.fillStyle = "rgb(255,255,255)";
             util.renderTextToCenterPos("(c) 2021 mono / Gabuniku", CANVAS_CONTEXT, 250, 160, true);
-            util.renderTextToCenterPos(CMD_LIST, CANVAS_CONTEXT, 250, 200, true);
             if (Math.sin(frame_count * 0.1) > 0) {
                 CANVAS_CONTEXT.font = "40px Impact";
                 util.renderTextToCenterPos("- Press Shot Key -", CANVAS_CONTEXT, 250, 430);

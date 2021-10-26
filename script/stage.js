@@ -22,9 +22,9 @@ const NormalStage = {
     blocks: fill_stage()
 };
 
-const KonamiStage = {
+export const KonamiStage = {
     name: "konami",
-    comment:"コナミさん許して(小並感)",
+    comment:"祝コナミコマンド35周年",
     blocks: [
         [],
         [-1, -1, -1, -1, -1, 10, 10, 10, 10, 10, 10, 13, 13, 13, 13, 10, 10, 10, 10, -1],
@@ -80,4 +80,4 @@ function fill_stage() {
     return arr;
 }
 
-export const STAGES = [NormalStage,KonamiStage];
+export const STAGES = [NormalStage];
