@@ -21,25 +21,20 @@ class Paddle extends Entity {
      * @param {number} size 
      */
     constructor(pos, size) {
-        super(pos, new util.Rect(pos.copy(), size, 10));
+        super(pos, new util.Rect(pos.copy(), size, 8));
         this.size = size;
         this.rect.setCenter(pos.copy());
     }
     update() {
         if (KeyStatus.Left) {
-            if (this.pos.x - (this.rect.width / 2) - this.speed >= 0) {
+            if (this.pos.x - (this.rect.width / 2) >= 0) {
                 this.pos.move(-this.speed, 0);
             }
         }
         if (KeyStatus.Right) {
-            if (this.pos.x + (this.rect.width / 2) + this.speed <= CANVAS.width) {
+            if (this.pos.x + (this.rect.width / 2) <= CANVAS.width) {
                 this.pos.move(this.speed, 0);
             }
-        }
-        if (KeyStatus.Shot) {
-            let pos = this.rect.getCenter();
-            pos.move(0, -10)
-            BALLS.push(new Ball(pos, util.getRandomRange(-135, -45), 5, 0));
         }
         super.update();
     }
@@ -99,13 +94,14 @@ var GAME_STATUS = 0;
 var StageSelectIndex = 0;
 /** @type {number} */
 var DestructibleBlockCount = 0; // ステージ上の消せるブロックの残り
-let PADDLE = new Paddle(new util.Pos(250, 450), 100);
-var ClearFrame = 0;
+const PaddleWidth = 60;
+let PADDLE = new Paddle(new util.Pos(250, 450), PaddleWidth);
+var EndFrame = 0;
 var ClearFlag = false;
+var GameOverFlag = false;
 var konami_flag = false;
 const CMD_LIST = [];
 const AudioData = {};
-
 /**
  * キーボードが押されたときに呼ばれる
  * @param {KeyboardEvent} evt 
@@ -201,14 +197,14 @@ function Title() {
     frame_count++;
     if (KeyStatus.Shot) {
         GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
-        SePlay(AudioData["hit"])
+        SePlay("hit")
         KeyReset();
         frame_count = 0;
     }
-    if(!konami_flag){
-        if(util.sameArray(["U","U","D","D","L","R","L","R","B","A"],CMD_LIST)){
+    if (!konami_flag) {
+        if (util.sameArray(["U", "U", "D", "D", "L", "R", "L", "R", "B", "A"], CMD_LIST)) {
             konami_flag = true;
-            SePlay(AudioData["gradius"]);
+            SePlay("gradius");
             STAGES.push(KonamiStage);
         }
     }
@@ -219,7 +215,6 @@ function StageSelect() {
         GAME_STATUS = GAME_STATUS_ENUM.GAME;
         KeyReset();
         frame_count = 0;
-        GAME_FLAG = true;
     }
     if (KeyStatus.Up) {
         if (StageSelectIndex > 0) {
@@ -244,16 +239,25 @@ function StageSelect() {
  * ゲーム状態
  */
 function Game() {
+    let paddle_coli = false;
     if (frame_count == 0) {
         // 初期化
-        PADDLE = new Paddle(new util.Pos(225, 450), 100);
+        PADDLE = new Paddle(new util.Pos(225, 450), PaddleWidth);
         ClearFlag = false;
-        ClearFrame = 0;
+        GameOverFlag = false;
+        GAME_FLAG = false;
+        EndFrame = 0;
         // @ts-ignore
         [BLOCKS, DestructibleBlockCount] = BuildStage(STAGES[StageSelectIndex].blocks);
         console.log(BLOCKS, DestructibleBlockCount);
     }
-    if (!ClearFlag) {
+    if (!GAME_FLAG && KeyStatus.Shot) {
+        GAME_FLAG = true;
+            let pos = PADDLE.rect.getCenter();
+            pos.move(0, -10)
+            BALLS.push(new Ball(pos, util.getRandomRange(-135, -45), 5, 0));
+    }
+    if (!ClearFlag && !GameOverFlag) {
         PADDLE.update();
         for (let index = 0; index < BALLS.length; index++) {
             const ball = BALLS[index];
@@ -262,14 +266,25 @@ function Game() {
                 BALLS.splice(index, 1); //削除
                 continue;
             }
-            ball.collision(PADDLE.rect);
+            if (ball.collision(PADDLE.rect)) {
+                let pos = ball.pos.getPos()[0];
+                let pos_p = PADDLE.pos.getPos()[0];
+                let dis = (pos - pos_p) / (PADDLE.rect.width / 2);
+                ball.setAngle(-90 + (60 * dis));
+                paddle_coli = true;
+            };
             for (let row = 0; row < BLOCKS.length; row++) {
                 const ROW = BLOCKS[row];
                 for (let col = 0; col < ROW.length; col++) {
                     const block = ROW[col];
                     if (ball.collision(block.rect)) {
-                        ROW.splice(col, 1);
-                        DestructibleBlockCount--;
+                        if (block.is_undead) {
+                            SePlay("hit2");
+                            continue
+                        } else {
+                            ROW.splice(col, 1);
+                            DestructibleBlockCount--;
+                        }
                     }
                 }
             }
@@ -278,14 +293,15 @@ function Game() {
             GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
             GAME_FLAG = false;
             KeyReset();
+            BALLS.splice(0);
             frame_count = 0;
         }
-    
+
     }
     if (DestructibleBlockCount == 0) {
         // クリア
         if (ClearFlag) {
-            if (ClearFrame + 60 < frame_count && KeyStatus.Shot) {
+            if (EndFrame + 60 < frame_count && KeyStatus.Shot) {
                 BALLS.splice(0);
                 GAME_FLAG = false;
                 GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
@@ -294,9 +310,27 @@ function Game() {
             }
         } else {
             ClearFlag = true;
-            ClearFrame = frame_count;
+            EndFrame = frame_count;
         }
 
+    }
+    if (BALLS.length == 0 && GAME_FLAG) {
+        if (GameOverFlag) {
+            if (EndFrame + 60 < frame_count && KeyStatus.Shot) {
+                BALLS.splice(0);
+                GAME_FLAG = false;
+                GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
+                frame_count = 0;
+                KeyReset();
+            }
+        }
+        else {
+            GameOverFlag = true;
+            EndFrame = frame_count;
+        }
+    }
+    if (paddle_coli) {
+        SePlay("hit3");
     }
 }
 
@@ -372,6 +406,13 @@ function Render() {
                 CANVAS_CONTEXT.font = "80px Impact";
                 util.renderTextToCenterPos("Clear !", CANVAS_CONTEXT, 250, 280, true);
             }
+            if (GameOverFlag) {
+                CANVAS_CONTEXT.fillStyle = "rgb(100, 100, 100)";
+                CANVAS_CONTEXT.fillRect(0, 200, 500, 100);
+                CANVAS_CONTEXT.fillStyle = "rgb(255, 255, 255)";
+                CANVAS_CONTEXT.font = "80px Impact";
+                util.renderTextToCenterPos("Game Over !", CANVAS_CONTEXT, 250, 280, true);
+            }
             break;
         case GAME_STATUS_ENUM.GAME_OVER:
             break;
@@ -382,11 +423,16 @@ function Render() {
 
 
 /**
- * @param {{ currentTime: number; play: () => void; }} audio
+ * @param {string}  key
  */
-function SePlay(audio) {
-    audio.currentTime = 0;
-    audio.play();
+function SePlay(key) {
+    try {
+        let audio = AudioData[key];
+        audio.currentTime = 0;
+        audio.play();
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 /**
@@ -412,7 +458,7 @@ function MainLoop() {
             break;
     }
     Render();
-    setTimeout(MainLoop, 16.66);
+    setTimeout(MainLoop, 16.666);
 }
 
 /**
@@ -431,6 +477,8 @@ function Init() {
     document.addEventListener("keydown", KeyDown);
     document.addEventListener("keyup", KeyUp);
     AudioData["hit"] = document.getElementById("se_hit");
+    AudioData["hit2"] = document.getElementById("se_hit2");
+    AudioData["hit3"] = document.getElementById("se_hit3");
     AudioData["gradius"] = document.getElementById("se_gradius");
     return true;
 }

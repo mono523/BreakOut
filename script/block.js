@@ -5,7 +5,7 @@
 // @ts-check
 
 import { Entity } from "./entity.js"
-import { Pos, Rect,getTypeColor } from "./util.js"
+import { Pos, Rect, getTypeColor } from "./util.js"
 //ブロック
 
 export class Block extends Entity {
@@ -17,15 +17,15 @@ export class Block extends Entity {
     constructor(pos, type, size) {
         super(pos, new Rect(pos.copy(), size, size));
         this.size = size;
-        this.type =  Math.floor(type / 10);//1のクライ
-        this.color = (type / 1) % 10; //10のクライ
+        this.type = type % 10; //10のクライ
+        this.color = Math.floor(type / 10);//1のクライ
         this.is_undead = (this.type == 2);
     }
     /**
      * a
      * @param {CanvasRenderingContext2D} ctx 
      */
-    render(ctx){
+    render(ctx) {
         let old_style = ctx.fillStyle;
         ctx.fillStyle = getTypeColor(this.color);
         let [x, y, w, h] = this.rect.getRectParam();
