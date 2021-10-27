@@ -36,11 +36,6 @@ class Paddle extends Entity {
                 this.pos.move(this.speed, 0);
             }
         }
-        if (KeyStatus.Shot) {
-            let pos = this.rect.getCenter();
-            pos.move(0, -10)
-            BALLS.push(new Ball(pos, util.getRandomRange(-135, -45), 5, 0));
-        }
         super.update();
     }
 }
@@ -258,6 +253,9 @@ function Game() {
     }
     if (!GAME_FLAG && KeyStatus.Shot) {
         GAME_FLAG = true;
+            let pos = PADDLE.rect.getCenter();
+            pos.move(0, -10)
+            BALLS.push(new Ball(pos, util.getRandomRange(-135, -45), 5, 0));
     }
     if (!ClearFlag && !GameOverFlag) {
         PADDLE.update();
