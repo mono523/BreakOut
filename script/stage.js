@@ -10,30 +10,30 @@ import { Block } from "./block.js"
 /**
  * ブロックのグリッドは25x16とする
  */
-export const BLOCK_SIZE = 20;
-export const GRID_SIZE = [25, 16];
+export const BLOCK_SIZE = 10;
+export const GRID_SIZE = [50, 40];
 
 
 const TestStage = fill_stage();
 
 const NormalStage = {
     name: "普通のステージ",
-    comment:"埋めただけ",
+    comment: "埋めただけ",
     blocks: fill_stage()
 };
 
 export const KonamiStage = {
     name: "konami",
-    comment:"祝コナミコマンド35周年",
+    comment: "祝コナミコマンド35周年",
     blocks: [
         [],
         [-1, -1, -1, -1, -1, 10, 10, 10, 10, 10, 10, 13, 13, 13, 13, 10, 10, 10, 10, -1],
         [-1, -1, -1, -1, -1, 10, 10, 10, 10, 10, 10, 13, 13, 13, 13, 10, 10, 10, 10, -1],
         [-1, -1, -1, -1, -1, 10, 10, 10, 10, 10, 13, 13, 13, 13, 13, 10, 10, 10, 10, -1],
         [-1, -1, -1, -1, -1, 10, 10, 10, 10, 13, 13, 13, 13, 10, 10, 10, 10, 10, 10, -1],
-        [-1, -1, -1, -1, -1, 10, 10, 10, 13, 13, 13, 10, 10, 10, 10, 10, 10, 10, 10, -1],
-        [-1, -1, -1, -1, -1, 10, 10, 13, 13, 13, 10, 10, 10, 10, 12, 12, 12, 12, 10, -1],
-        [-1, -1, -1, -1, -1, 10, 13, 13, 13, 13, 10, 10, 10, 10, 12, 12, 12, 12, 10, -1],
+        [-1, -1, -1, -1, -1, 20, 10, 10, 13, 13, 13, 10, 10, 10, 10, 10, 10, 10, 10, -1],
+        [-1, -1, -1, -1, -1, 10, 20, 13, 13, 13, 10, 10, 10, 10, 12, 12, 12, 12, 10, -1],
+        [-1, -1, -1, -1, -1, 10, 13, 23, 13, 13, 10, 10, 10, 10, 12, 12, 12, 12, 10, -1],
         [-1, -1, -1, -1, -1, 10, 13, 13, 13, 13, 10, 10, 10, 10, 12, 12, 12, 12, 10, -1],
         [-1, -1, -1, -1, -1, 10, 10, 10, 10, 10, 10, 10, 10, 12, 12, 12, 12, 10, 10, -1],
         [-1, -1, -1, -1, -1, 10, 10, 10, 10, 10, 10, 12, 12, 12, 12, 12, 10, 10, 10, -1],
@@ -58,15 +58,26 @@ export function BuildStage(blocks) {
             if (type >= 0) {
                 let block = new Block(new Pos(0 + (BLOCK_SIZE * col), 0 + (BLOCK_SIZE * row)), type, BLOCK_SIZE);
                 row_build.push(block);
-                if (!block.is_undead){
+                if (!block.is_undead) {
                     count++;
                 }
             }
         }
         arr.push(row_build);
     }
-    return [arr,count];
+    return [arr, count];
 }
+
+/**
+ * 
+ * @param {number} type 
+ * @param {number} count 
+ * @returns {Array<number>}
+ */
+function fillBlock(type, count) {
+    return new Array(count).fill(type);
+}
+
 
 function fill_stage() {
     let arr = [];

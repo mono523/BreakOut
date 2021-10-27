@@ -225,20 +225,20 @@ export class Rect {
         let off_x, off_y;
         switch (result.colliEdge) {
             case RectEdgeDirection.UP:
-                off_x = 0;
+                off_x = 1;
                 off_y = 1;
                 break;
             case RectEdgeDirection.DOWN:
-                off_x = 0;
+                off_x = 1;
                 off_y = -1;
                 break;
             case RectEdgeDirection.LEFT:
                 off_x = 1;
-                off_y = 0;
+                off_y = 1;
                 break;
             case RectEdgeDirection.RIGHT:
                 off_x = -1;
-                off_y = 0;
+                off_y = 1;
                 break;
         }
         this.pos.move(result.collisionX * off_x, result.collisionY * off_y);

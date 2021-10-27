@@ -201,14 +201,14 @@ function Title() {
     frame_count++;
     if (KeyStatus.Shot) {
         GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
-        SePlay(AudioData["hit"])
+        SePlay("hit")
         KeyReset();
         frame_count = 0;
     }
-    if(!konami_flag){
-        if(util.sameArray(["U","U","D","D","L","R","L","R","B","A"],CMD_LIST)){
+    if (!konami_flag) {
+        if (util.sameArray(["U", "U", "D", "D", "L", "R", "L", "R", "B", "A"], CMD_LIST)) {
             konami_flag = true;
-            SePlay(AudioData["gradius"]);
+            SePlay("gradius");
             STAGES.push(KonamiStage);
         }
     }
@@ -262,14 +262,24 @@ function Game() {
                 BALLS.splice(index, 1); //削除
                 continue;
             }
-            ball.collision(PADDLE.rect);
+            if (ball.collision(PADDLE.rect)) {
+                let pos = ball.pos.getPos()[0];
+                let pos_p = PADDLE.pos.getPos()[0];
+                let dis = (pos - pos_p) / PADDLE.rect.width;
+                ball.setAngle(-90+(45*dis));
+            };
             for (let row = 0; row < BLOCKS.length; row++) {
                 const ROW = BLOCKS[row];
                 for (let col = 0; col < ROW.length; col++) {
                     const block = ROW[col];
                     if (ball.collision(block.rect)) {
-                        ROW.splice(col, 1);
-                        DestructibleBlockCount--;
+                        if (block.is_undead) {
+                            SePlay("hit2");
+                            continue
+                        } else {
+                            ROW.splice(col, 1);
+                            DestructibleBlockCount--;
+                        }
                     }
                 }
             }
@@ -280,7 +290,7 @@ function Game() {
             KeyReset();
             frame_count = 0;
         }
-    
+
     }
     if (DestructibleBlockCount == 0) {
         // クリア
@@ -382,11 +392,16 @@ function Render() {
 
 
 /**
- * @param {{ currentTime: number; play: () => void; }} audio
+ * @param {string}  key
  */
-function SePlay(audio) {
-    audio.currentTime = 0;
-    audio.play();
+function SePlay(key) {
+    try {
+        let audio = AudioData[key];
+        audio.currentTime = 0;
+        audio.play();
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 /**
@@ -412,7 +427,7 @@ function MainLoop() {
             break;
     }
     Render();
-    setTimeout(MainLoop, 16.66);
+    setTimeout(MainLoop, 16.666);
 }
 
 /**
@@ -431,6 +446,7 @@ function Init() {
     document.addEventListener("keydown", KeyDown);
     document.addEventListener("keyup", KeyUp);
     AudioData["hit"] = document.getElementById("se_hit");
+    AudioData["hit2"] = document.getElementById("se_hit2");
     AudioData["gradius"] = document.getElementById("se_gradius");
     return true;
 }

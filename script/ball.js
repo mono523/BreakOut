@@ -24,11 +24,11 @@ export class Ball extends Entity {
     }
     update() {
         this.goForward();
-        if (this.pos.x <= 0 || this.pos.x >= 500) {
+        if (this.pos.x - this.size <= 0 || this.pos.x + this.size >= 500) {
             let angle = util.getReflectAngle(this.angle, util.RectEdgeDirection.LEFT);
             this.setAngle(angle);
         }
-        if (this.pos.y <= 0) {
+        if (this.pos.y - this.size <= 0) {
             let angle = util.getReflectAngle(this.angle, util.RectEdgeDirection.UP);
             this.setAngle(angle);
         }
@@ -43,7 +43,6 @@ export class Ball extends Entity {
     collision(rect) {
         let edge = this.rect.getCollisionAndFix(rect);
         if (edge != util.RectEdgeDirection.NONE) {
-            let pos = this.rect.pos.copy();
             this.setAngle(util.getReflectAngle(this.angle, edge));
             return true;
         }else{
