@@ -17,9 +17,46 @@ export const GRID_SIZE = [50, 40];
 const TestStage = fill_stage();
 
 const NormalStage = {
-    name: "普通のステージ",
+    name: "Stage1",
     comment: "埋めただけ",
-    blocks: fill_stage()
+    blocks: [
+        [...fillBlock(30,GRID_SIZE[0])],
+        [...fillBlock(30,GRID_SIZE[0])],
+        [...fillBlock(30,GRID_SIZE[0])],
+        [...fillBlock(30,GRID_SIZE[0])],
+        [...fillBlock(30,GRID_SIZE[0])],
+        [...fillBlock(40,GRID_SIZE[0])],
+        [...fillBlock(40,GRID_SIZE[0])],
+        [...fillBlock(40,GRID_SIZE[0])],
+        [...fillBlock(40,GRID_SIZE[0])],
+        [...fillBlock(40,GRID_SIZE[0])],
+        [...fillBlock(50,GRID_SIZE[0])],
+        [...fillBlock(50,GRID_SIZE[0])],
+        [...fillBlock(50,GRID_SIZE[0])],
+        [...fillBlock(50,GRID_SIZE[0])],
+        [...fillBlock(50,GRID_SIZE[0])],
+        [...fillBlock(60,GRID_SIZE[0])],
+        [...fillBlock(60,GRID_SIZE[0])],
+        [...fillBlock(60,GRID_SIZE[0])],
+        [...fillBlock(60,GRID_SIZE[0])],
+        [...fillBlock(60,GRID_SIZE[0])],
+        [...fillBlock(80,GRID_SIZE[0])],
+        [...fillBlock(80,GRID_SIZE[0])],
+        [...fillBlock(80,GRID_SIZE[0])],
+        [...fillBlock(80,GRID_SIZE[0])],
+        [...fillBlock(80,GRID_SIZE[0])],
+        [...fillBlock(120,GRID_SIZE[0])],
+        [...fillBlock(120,GRID_SIZE[0])],
+        [...fillBlock(120,GRID_SIZE[0])],
+        [...fillBlock(120,GRID_SIZE[0])],
+        [...fillBlock(120,GRID_SIZE[0])],
+        [...fillBlock(90,GRID_SIZE[0])],
+        [...fillBlock(90,GRID_SIZE[0])],
+        [...fillBlock(90,GRID_SIZE[0])],
+        [...fillBlock(90,GRID_SIZE[0])],
+        [...fillBlock(90,GRID_SIZE[0])],
+        [...fillBlock(90,GRID_SIZE[0])],
+    ]
 };
 
 
