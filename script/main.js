@@ -447,6 +447,7 @@ function Init() {
     document.addEventListener("keyup", KeyUp);
     AudioData["hit"] = document.getElementById("se_hit");
     AudioData["hit2"] = document.getElementById("se_hit2");
+    AudioData["hit3"] = document.getElementById("se_hit3");
     AudioData["gradius"] = document.getElementById("se_gradius");
     return true;
 }
