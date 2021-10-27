@@ -265,8 +265,8 @@ function Game() {
             if (ball.collision(PADDLE.rect)) {
                 let pos = ball.pos.getPos()[0];
                 let pos_p = PADDLE.pos.getPos()[0];
-                let dis = (pos - pos_p) / PADDLE.rect.width;
-                ball.setAngle(-90+(45*dis));
+                let dis = (pos - pos_p) / (PADDLE.rect.width / 2);
+                ball.setAngle(-90 + (60 * dis));
             };
             for (let row = 0; row < BLOCKS.length; row++) {
                 const ROW = BLOCKS[row];
