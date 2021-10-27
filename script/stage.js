@@ -25,7 +25,7 @@ const NormalStage = {
 
 export const KonamiStage = {
     name: "konami",
-    comment: "祝コナミコマンド35周年",
+    comment: "↑↑↓↓←→←→BA",
     blocks: [
         [], [], [],
         // バイパー
