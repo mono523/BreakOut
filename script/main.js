@@ -244,6 +244,7 @@ function StageSelect() {
  * ゲーム状態
  */
 function Game() {
+    let paddle_coli = false;
     if (frame_count == 0) {
         // 初期化
         PADDLE = new Paddle(new util.Pos(225, 450), 100);
@@ -267,6 +268,7 @@ function Game() {
                 let pos_p = PADDLE.pos.getPos()[0];
                 let dis = (pos - pos_p) / (PADDLE.rect.width / 2);
                 ball.setAngle(-90 + (60 * dis));
+                paddle_coli = true;
             };
             for (let row = 0; row < BLOCKS.length; row++) {
                 const ROW = BLOCKS[row];
@@ -288,6 +290,7 @@ function Game() {
             GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
             GAME_FLAG = false;
             KeyReset();
+            BALLS.splice(0);
             frame_count = 0;
         }
 
@@ -307,6 +310,9 @@ function Game() {
             ClearFrame = frame_count;
         }
 
+    }
+    if(paddle_coli){
+        SePlay("hit3");
     }
 }
 

@@ -326,16 +326,19 @@ export function getReflectAngle(angle, edge = RectEdgeDirection.NONE) {
 }
 
 export const COLOR_TYPE = {
-    WHITE: 0,
-    BLACK: 1,
-    RED: 2,
-    ORANGE: 3,
-    YELLOW: 4,
-    GREEN: 5,
-    YELLOW_GREEN: 6,
-    BLUE: 7,
-    PURPLE: 8,
-    PINK: 9,
+    WHITE: 1,
+    BLACK: 2,
+    RED: 3,
+    ORANGE: 4,
+    YELLOW: 5,
+    GREEN: 6,
+    YELLOW_GREEN: 7,
+    BLUE: 8,
+    PURPLE: 9,
+    PINK: 10,
+    SKY_BLUE:11,
+    DARK_BLUE:12,
+    LIGHT_GRAY : 13
 };
 
 /**
@@ -352,7 +355,7 @@ export function getTypeColor(type) {
         case COLOR_TYPE.RED:
             return "rgb(255, 0, 0)";
         case COLOR_TYPE.ORANGE:
-            return "rgb(255, 100, 0)";
+            return "rgb(255, 120, 48)";
         case COLOR_TYPE.YELLOW:
             return "rgb(255, 255, 0)";
         case COLOR_TYPE.GREEN:
@@ -365,6 +368,12 @@ export function getTypeColor(type) {
             return "rgb(150, 0, 255)";
         case COLOR_TYPE.PINK:
             return "rgb(255, 0, 255)";
+        case COLOR_TYPE.SKY_BLUE:
+            return "rgb(144, 222, 233)"
+        case COLOR_TYPE.DARK_BLUE:
+            return "rgb(48, 80, 128)"
+        case COLOR_TYPE.LIGHT_GRAY:
+            return "rgb(226, 226, 226)"
         default:
             return "rgb(255, 255, 255)";
     }
