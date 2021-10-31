@@ -63,6 +63,7 @@ const NormalStage = {
 export const KonamiStage = {
     name: "konami",
     comment: "↑↑↓↓←→←→BA",
+    back_color:"rgb(0,0,0)",
     blocks: [
         [], [], [],
         // バイパー

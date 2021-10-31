@@ -385,7 +385,8 @@ function Render() {
             util.renderTextToCenterPos("- Use ↑ or ↓ to Select -", CANVAS_CONTEXT, 250, 150, true);
             break;
         case GAME_STATUS_ENUM.GAME:
-            CANVAS_CONTEXT.fillStyle = "rgb(0,255,255)";
+            CANVAS_CONTEXT.fillStyle = STAGES[StageSelectIndex].back_color;
+            CANVAS_CONTEXT.fillRect(0, 0, CANVAS.width, CANVAS.height);
             for (let index = 0; index < BALLS.length; index++) {
                 const ball = BALLS[index];
                 ball.render(CANVAS_CONTEXT);
