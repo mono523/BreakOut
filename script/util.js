@@ -185,16 +185,17 @@ export class Rect {
         let edge_size_y = rect_half[1] + rect1_half[1];
         let collision_x = diff_x_abs - edge_size_x; //重なっている辺の長さ
         let collision_y = diff_y_abs - edge_size_y;
+        let late_x = collision_x / (this.width + rect.width);
+        let late_y = collision_y / (this.height + rect.height);
         let colliEdge = RectEdgeDirection.NONE;
-
-        if (collision_x > collision_y) {
-            if ((rect.pos.x - this.pos.x) > 0) {//自分が左側 -> 右の辺
+        if (late_x > late_y) {
+            if (rect_pos[0] < rect1_pos[0]) {//自分が左側 -> 右の辺
                 colliEdge = RectEdgeDirection.RIGHT;
             } else {
                 colliEdge = RectEdgeDirection.LEFT;
             }
         } else {
-            if ((rect.pos.y - this.pos.y) > 0) {//自分が上 -> 下の辺
+            if (rect_pos[1] < rect1_pos[1]) {//自分が上 -> 下の辺
                 colliEdge = RectEdgeDirection.DOWN;
             } else {
                 colliEdge = RectEdgeDirection.UP;
@@ -217,31 +218,26 @@ export class Rect {
      * 当たり判定の検証とめり込み補正
      * @param {Rect} rect 
      */
-    getCollisionAndFix(rect) {
+    getCollisionAndFix(rect, angle, speed) {
         let result = this.getCollisionEdge(rect, true);
         if (result.colliEdge == RectEdgeDirection.NONE) {
             return result.colliEdge;
         }
-        let off_x, off_y;
+        let late;
+        let late_x = Math.sin(angle) * speed;
+        let late_y = Math.sin(angle) * speed;
         switch (result.colliEdge) {
             case RectEdgeDirection.UP:
-                off_x = 1;
-                off_y = 1;
-                break;
             case RectEdgeDirection.DOWN:
-                off_x = 1;
-                off_y = -1;
+                late = result.collisionY / late_y;
+                this.pos.move(result.collisionX * late, result.collisionY);
                 break;
             case RectEdgeDirection.LEFT:
-                off_x = 1;
-                off_y = 1;
-                break;
             case RectEdgeDirection.RIGHT:
-                off_x = -1;
-                off_y = 1;
+                late = result.collisionX / late_x;
+                this.pos.move(result.collisionX, result.collisionY * late);
                 break;
         }
-        this.pos.move(result.collisionX * off_x, result.collisionY * off_y);
         return result.colliEdge;
     }
     /**
@@ -336,9 +332,9 @@ export const COLOR_TYPE = {
     BLUE: 8,
     PURPLE: 9,
     PINK: 10,
-    SKY_BLUE:11,
-    DARK_BLUE:12,
-    LIGHT_GRAY : 13
+    SKY_BLUE: 11,
+    DARK_BLUE: 12,
+    LIGHT_GRAY: 13
 };
 
 /**
@@ -407,14 +403,29 @@ export function renderTextToCenterPos(text, ctx, x, y = 0, fill = false) {
  * @param {Array} target - 検証される方
  * @returns {boolean}
  */
-export function sameArray(base,target){
-    if(base.length != target.length){
+export function sameArray(base, target) {
+    if (base.length != target.length) {
         return false;
     }
-    for(let i =0;i<base.length;i++){
-        if(base[i]!=target[i]){
+    for (let i = 0; i < base.length; i++) {
+        if (base[i] != target[i]) {
             return false;
         }
     }
     return true;
+}
+
+
+/**
+ * p％の確率でtrueを返す
+ * @param {number} p - 確率
+ * @returns {boolean}
+ */
+export function getProbability(p) {
+    let v = getRandomRange(0, 100);
+    if (v <= p) {
+        return true;
+    } else {
+        return false;
+    }
 }
