@@ -19,6 +19,7 @@ const TestStage = fill_stage();
 const NormalStage1 = {
     name: "Stage1",
     comment: "埋めただけ",
+    back_color:"rgb(0,0,0)",
     blocks: [
         [...fillBlock(30,GRID_SIZE[0])],
         [...fillBlock(30,GRID_SIZE[0])],
@@ -102,6 +103,7 @@ export const KonamiStage = {
 const NormalStage2 = {
     name: "Stage2",
     comment:"よくあるステージ",
+    back_color:"rgb(0,0,0)",
     blocks: [
         [],
         [],
@@ -146,6 +148,7 @@ const NormalStage2 = {
 const MonoStage = {
     name: "Stage3",
     comment:"MONO消しゴム",
+    back_color:"rgb(160,160,160)",
     blocks: [
         [80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,],
         [80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,],
