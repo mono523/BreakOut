@@ -18,7 +18,7 @@ export class Ball extends Entity {
      * @param {number} type - 種類
      */
     constructor(pos, angle, size, type) {
-        super(pos, new util.Rect(pos.copy(), size, size), angle, 3);
+        super(pos, new util.Rect(pos.copy(), size + 1, size + 1), angle, 3);
         this.type = type;
         this.size = size;
     }
@@ -27,9 +27,15 @@ export class Ball extends Entity {
         if (this.pos.x - this.size <= 0 || this.pos.x + this.size >= 500) {
             let angle = util.getReflectAngle(this.angle, util.RectEdgeDirection.LEFT);
             this.setAngle(angle);
+            if (this.pos.x - this.size <= 0) {
+                this.pos.x = this.size;
+            } else {
+                this.pos.x = 500 - this.size;
+            }
         }
         if (this.pos.y - this.size <= 0) {
             let angle = util.getReflectAngle(this.angle, util.RectEdgeDirection.UP);
+            this.pos.y = 0 + this.size;
             this.setAngle(angle);
         }
         super.update();
@@ -38,14 +44,22 @@ export class Ball extends Entity {
     /**
      * 
      * @param {util.Rect} rect - paddle rect
-     * @returns {boolean}
+     * @returns {number}
      */
     collision(rect) {
+        return this.rect.getCollisionEdge(rect);
+    }
+    /**
+     * 
+     * @param {util.Rect} rect - paddle rect
+     * @returns {boolean}
+     */
+    collisionAndFix(rect) {
         let edge = this.rect.getCollisionAndFix(rect);
         if (edge != util.RectEdgeDirection.NONE) {
             this.setAngle(util.getReflectAngle(this.angle, edge));
             return true;
-        }else{
+        } else {
             return false;
         }
     }

@@ -9,6 +9,7 @@ import { Ball } from "./ball.js"
 import { Entity } from "./entity.js";
 import { Block } from "./block.js";
 import { BuildStage, KonamiStage, STAGES } from "./stage.js";
+import { Item } from "./item.js";
 
 //メインファイル
 
@@ -56,6 +57,8 @@ var frame_count = 0;
 const BALLS = [];
 /** @type {Array<Array<Block>>} */
 var BLOCKS = [];
+/** @type {Array<Item>} */
+const ITEMS = [];
 /** @type {util.Clock} */
 const CLOCK = new util.Clock(60);
 /** @type {util.Rect} */
@@ -100,6 +103,7 @@ var EndFrame = 0;
 var ClearFlag = false;
 var GameOverFlag = false;
 var konami_flag = false;
+var cheat_flag = false;
 const CMD_LIST = [];
 const AudioData = {};
 /**
@@ -189,6 +193,29 @@ function KeyReset() {
     KeyStatus.Shot = false;
     KeyStatus.Escape = false;
 }
+/**
+ * アイテムを取った時
+ * @param {number} type 
+ */
+function ItemFunc(type) {
+    switch (type) {
+        case 3:
+            //弾二倍
+            for (let index = 0; index < BALLS.length/2; index++) {
+                const ball = BALLS[index];
+                BALLS.push(new Ball(ball.pos.copy(), ball.angle + util.getRandomRange(-180,180), ball.size, ball.type))
+            }
+            break;
+        case 4:
+            // 三つ弾を出す
+            let pos = PADDLE.pos.copy();
+            pos.move(0, -5);
+            for (let index = 0; index < 3; index++) {
+                BALLS.push(new Ball(pos.copy(), -135 + (45 * index), 5, 0))
+            }
+            break;
+    }
+}
 
 /**
  * タイトル画面
@@ -207,6 +234,13 @@ function Title() {
             SePlay("gradius");
             STAGES.push(KonamiStage);
         }
+    }
+    if (util.sameArray(["D", "D", "U", "U", "R", "L", "R", "L", "A", "B"], CMD_LIST)) {
+        if (cheat_flag) {
+            cheat_flag = false;
+        } else { cheat_flag = true; }
+        SePlay("gradius");
+        CMD_LIST.splice(0);
     }
 }
 
@@ -247,26 +281,29 @@ function Game() {
         GameOverFlag = false;
         GAME_FLAG = false;
         EndFrame = 0;
+        ITEMS.splice(0);
         // @ts-ignore
         [BLOCKS, DestructibleBlockCount] = BuildStage(STAGES[StageSelectIndex].blocks);
         console.log(BLOCKS, DestructibleBlockCount);
     }
     if (!GAME_FLAG && KeyStatus.Shot) {
         GAME_FLAG = true;
-            let pos = PADDLE.rect.getCenter();
-            pos.move(0, -10)
-            BALLS.push(new Ball(pos, util.getRandomRange(-135, -45), 5, 0));
+        let pos = PADDLE.rect.getCenter();
+        pos.move(0, -10)
+        BALLS.push(new Ball(pos, util.getRandomRange(-135, -45), 5, 0));
     }
     if (!ClearFlag && !GameOverFlag) {
         PADDLE.update();
+        let block_coll_snd = false;
         for (let index = 0; index < BALLS.length; index++) {
             const ball = BALLS[index];
             ball.update();
+            let block_coll = false;
             if (ball.pos.y > CANVAS.height + 20) {
                 BALLS.splice(index, 1); //削除
                 continue;
             }
-            if (ball.collision(PADDLE.rect)) {
+            if (ball.collisionAndFix(PADDLE.rect)) {
                 let pos = ball.pos.getPos()[0];
                 let pos_p = PADDLE.pos.getPos()[0];
                 let dis = (pos - pos_p) / (PADDLE.rect.width / 2);
@@ -277,17 +314,38 @@ function Game() {
                 const ROW = BLOCKS[row];
                 for (let col = 0; col < ROW.length; col++) {
                     const block = ROW[col];
-                    if (ball.collision(block.rect)) {
+                    let edge = ball.collision(block.rect);
+                    if (edge != util.RectEdgeDirection.NONE) {
                         if (block.is_undead) {
                             SePlay("hit2");
                             continue
                         } else {
+                            block_coll_snd = true;
                             ROW.splice(col, 1);
                             DestructibleBlockCount--;
+                            if (util.getProbability(20)) {
+                                ITEMS.push(new Item(block.pos.copy(), Math.floor(util.getRandomRange(3, 5))))
+                            }
+                        }
+                        if (block_coll) {
+                            continue;
+                        }
+                        else {
+                            block_coll = true;
+                            ball.setAngle(util.getReflectAngle(ball.angle, edge));
                         }
                     }
                 }
             }
+        }
+        for (let index = 0; index < ITEMS.length; index++) {
+            const item = ITEMS[index];
+            item.update()
+            if (item.rect.getCollision(PADDLE.rect)) {
+                ItemFunc(item.type);
+                ITEMS.splice(index, 1);
+            }
+
         }
         if (KeyStatus.Escape) {
             GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
@@ -296,6 +354,9 @@ function Game() {
             BALLS.splice(0);
             frame_count = 0;
         }
+        if (block_coll_snd) {
+            // SePlay("hit4");
+        }
 
     }
     if (DestructibleBlockCount == 0) {
@@ -303,6 +364,7 @@ function Game() {
         if (ClearFlag) {
             if (EndFrame + 60 < frame_count && KeyStatus.Shot) {
                 BALLS.splice(0);
+                ITEMS.splice(0);
                 GAME_FLAG = false;
                 GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
                 frame_count = 0;
@@ -318,6 +380,7 @@ function Game() {
         if (GameOverFlag) {
             if (EndFrame + 60 < frame_count && KeyStatus.Shot) {
                 BALLS.splice(0);
+                ITEMS.splice(0);
                 GAME_FLAG = false;
                 GAME_STATUS = GAME_STATUS_ENUM.STAGE_SELECT;
                 frame_count = 0;
@@ -390,6 +453,8 @@ function Render() {
             for (let index = 0; index < BALLS.length; index++) {
                 const ball = BALLS[index];
                 ball.render(CANVAS_CONTEXT);
+                //CANVAS_CONTEXT.fillStyle = "rgb(255, 0, 0)";
+                //CANVAS_CONTEXT.fillRect(ball.rect.pos.x, ball.rect.pos.y, ball.rect.width, ball.rect.height);
             }
             for (let row = 0; row < BLOCKS.length; row++) {
                 const ROW = BLOCKS[row];
@@ -397,6 +462,12 @@ function Render() {
                     const block = ROW[col];
                     block.render(CANVAS_CONTEXT);
                 }
+            }
+            for (let index = 0; index < ITEMS.length; index++) {
+                const item = ITEMS[index];
+                item.render(CANVAS_CONTEXT);
+
+
             }
             CANVAS_CONTEXT.fillStyle = "rgb(255,255,255)";
             PADDLE.render(CANVAS_CONTEXT);
@@ -480,6 +551,7 @@ function Init() {
     AudioData["hit"] = document.getElementById("se_hit");
     AudioData["hit2"] = document.getElementById("se_hit2");
     AudioData["hit3"] = document.getElementById("se_hit3");
+    AudioData["hit4"] = document.getElementById("se_hit4");
     AudioData["gradius"] = document.getElementById("se_gradius");
     return true;
 }
