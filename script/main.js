@@ -103,7 +103,7 @@ var EndFrame = 0;
 var ClearFlag = false;
 var GameOverFlag = false;
 var konami_flag = false;
-var cheat_flag = false;
+var debug_flag = false;
 const CMD_LIST = [];
 const AudioData = {};
 /**
@@ -201,9 +201,9 @@ function ItemFunc(type) {
     switch (type) {
         case 3:
             //弾二倍
-            for (let index = 0; index < BALLS.length/2; index++) {
+            for (let index = 0; index < BALLS.length / 2; index++) {
                 const ball = BALLS[index];
-                BALLS.push(new Ball(ball.pos.copy(), ball.angle + util.getRandomRange(-180,180), ball.size, ball.type))
+                BALLS.push(new Ball(ball.pos.copy(), ball.angle + util.getRandomRange(-180, 180), ball.size, ball.type))
             }
             break;
         case 4:
@@ -234,13 +234,6 @@ function Title() {
             SePlay("gradius");
             STAGES.push(KonamiStage);
         }
-    }
-    if (util.sameArray(["D", "D", "U", "U", "R", "L", "R", "L", "A", "B"], CMD_LIST)) {
-        if (cheat_flag) {
-            cheat_flag = false;
-        } else { cheat_flag = true; }
-        SePlay("gradius");
-        CMD_LIST.splice(0);
     }
 }
 
@@ -491,6 +484,19 @@ function Render() {
         default:
             break;
     }
+    if (debug_flag) {
+        CANVAS_CONTEXT.fillStyle = "rgb(0, 152, 255)";
+        CANVAS_CONTEXT.font = "20px Impact";
+        CANVAS_CONTEXT.fillText("debug_flag " + debug_flag, 0, 20);
+        CANVAS_CONTEXT.fillText("konami_flag " + konami_flag, 0, 40);
+        CANVAS_CONTEXT.fillText("StageSelectIndex " + StageSelectIndex, 0, 60);
+        CANVAS_CONTEXT.fillText("CMD_LIST " + CMD_LIST, 0, 80);
+        CANVAS_CONTEXT.fillText("BALLS::length " + BALLS.length, 0, 100);
+        CANVAS_CONTEXT.fillText("ITEMS::length " + ITEMS.length, 0, 120);
+        CANVAS_CONTEXT.fillText("BLOCKS::length " + BLOCKS.length, 0, 140);
+        CANVAS_CONTEXT.fillText("DestructibleBlockCount " + DestructibleBlockCount, 0, 160);
+        CANVAS_CONTEXT.fillText("ALL Object Count " + (BALLS.length + ITEMS.length + DestructibleBlockCount), 0, 180);
+    }
 }
 
 
@@ -530,6 +536,13 @@ function MainLoop() {
             break;
     }
     Render();
+    if (util.sameArray(["D", "D", "U", "U", "R", "L", "R", "L", "A", "B"], CMD_LIST)) {
+        if (debug_flag) {
+            debug_flag = false;
+        } else { debug_flag = true; }
+        SePlay("gradius");
+        CMD_LIST.splice(0);
+    }
     setTimeout(MainLoop, 16.666);
 }
 
