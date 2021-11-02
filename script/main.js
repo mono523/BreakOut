@@ -103,7 +103,9 @@ var EndFrame = 0;
 var ClearFlag = false;
 var GameOverFlag = false;
 var konami_flag = false;
-var cheat_flag = false;
+var debug_flag = false;
+var AI_flag = false;
+const MAX_BALL_LIMIT = 1500;
 const CMD_LIST = [];
 const AudioData = {};
 /**
@@ -201,9 +203,12 @@ function ItemFunc(type) {
     switch (type) {
         case 3:
             //弾二倍
-            for (let index = 0; index < BALLS.length/2; index++) {
+            for (let index = 0; index < BALLS.length / 2; index++) {
+                if (BALLS.length > MAX_BALL_LIMIT) {
+                    break;
+                }
                 const ball = BALLS[index];
-                BALLS.push(new Ball(ball.pos.copy(), ball.angle + util.getRandomRange(-180,180), ball.size, ball.type))
+                BALLS.push(new Ball(ball.pos.copy(), ball.angle + util.getRandomRange(-180, 180), ball.size, ball.type))
             }
             break;
         case 4:
@@ -211,6 +216,9 @@ function ItemFunc(type) {
             let pos = PADDLE.pos.copy();
             pos.move(0, -5);
             for (let index = 0; index < 3; index++) {
+                if (BALLS.length > MAX_BALL_LIMIT) {
+                    break;
+                }
                 BALLS.push(new Ball(pos.copy(), -135 + (45 * index), 5, 0))
             }
             break;
@@ -234,13 +242,6 @@ function Title() {
             SePlay("gradius");
             STAGES.push(KonamiStage);
         }
-    }
-    if (util.sameArray(["D", "D", "U", "U", "R", "L", "R", "L", "A", "B"], CMD_LIST)) {
-        if (cheat_flag) {
-            cheat_flag = false;
-        } else { cheat_flag = true; }
-        SePlay("gradius");
-        CMD_LIST.splice(0);
     }
 }
 
@@ -284,7 +285,6 @@ function Game() {
         ITEMS.splice(0);
         // @ts-ignore
         [BLOCKS, DestructibleBlockCount] = BuildStage(STAGES[StageSelectIndex].blocks);
-        console.log(BLOCKS, DestructibleBlockCount);
     }
     if (!GAME_FLAG && KeyStatus.Shot) {
         GAME_FLAG = true;
@@ -293,6 +293,30 @@ function Game() {
         BALLS.push(new Ball(pos, util.getRandomRange(-135, -45), 5, 0));
     }
     if (!ClearFlag && !GameOverFlag) {
+        if (AI_flag && BALLS.length > 0) {
+            const lower = util.getLowerEntity(BALLS);
+            const near_balls = util.sortBallPriority(BALLS,PADDLE.rect);
+            let near_entity = null;
+            if (near_balls.length == 0) {
+                if (ITEMS.length > 0) {
+                    near_entity = util.getNearEntity(PADDLE.pos, ITEMS);
+                }
+            } else {
+                near_entity = near_balls[0];
+            }
+            KeyStatus.Left = false;
+            KeyStatus.Right = false;
+            if (near_entity != null) {
+                if (Math.abs(PADDLE.rect.getCenter().x - near_entity.rect.getCenter().x) > 15) {
+                    if (PADDLE.rect.getCenter().x < near_entity.rect.getCenter().x) {
+                        KeyStatus.Right = true;
+                    }
+                    else {
+                        KeyStatus.Left = true;
+                    }
+                }
+            }
+        }
         PADDLE.update();
         let block_coll_snd = false;
         for (let index = 0; index < BALLS.length; index++) {
@@ -344,6 +368,9 @@ function Game() {
             if (item.rect.getCollision(PADDLE.rect)) {
                 ItemFunc(item.type);
                 ITEMS.splice(index, 1);
+            }
+            if(item.pos.y > 510){
+                ITEMS.splice(index,1);
             }
 
         }
@@ -453,6 +480,12 @@ function Render() {
             for (let index = 0; index < BALLS.length; index++) {
                 const ball = BALLS[index];
                 ball.render(CANVAS_CONTEXT);
+                if (debug_flag) {
+                    CANVAS_CONTEXT.fillStyle = "rgb(150, 150, 150)";
+                    CANVAS_CONTEXT.font = "10px メイリオ";
+                    let [x, y] = ball.rect.getCenter().getPos();
+                    util.renderTextToCenterPos(String(Math.floor(ball.getDownTime())), CANVAS_CONTEXT, x, y - 10, true);
+                }
                 //CANVAS_CONTEXT.fillStyle = "rgb(255, 0, 0)";
                 //CANVAS_CONTEXT.fillRect(ball.rect.pos.x, ball.rect.pos.y, ball.rect.width, ball.rect.height);
             }
@@ -469,8 +502,9 @@ function Render() {
 
 
             }
-            CANVAS_CONTEXT.fillStyle = "rgb(255,255,255)";
+            CANVAS_CONTEXT.fillStyle = "rgb(200,200,200)";
             PADDLE.render(CANVAS_CONTEXT);
+            CANVAS_CONTEXT.fillStyle = "rgb(255,255,255)";
             if (ClearFlag) {
                 CANVAS_CONTEXT.fillStyle = "rgb(100, 100, 100)";
                 CANVAS_CONTEXT.fillRect(0, 200, 500, 100);
@@ -490,6 +524,20 @@ function Render() {
             break;
         default:
             break;
+    }
+    if (debug_flag) {
+        CANVAS_CONTEXT.fillStyle = "rgb(0, 152, 255)";
+        CANVAS_CONTEXT.font = "20px Impact";
+        CANVAS_CONTEXT.fillText("debug_flag " + debug_flag, 0, 20);
+        CANVAS_CONTEXT.fillText("konami_flag " + konami_flag, 0, 40);
+        CANVAS_CONTEXT.fillText("StageSelectIndex " + StageSelectIndex, 0, 60);
+        CANVAS_CONTEXT.fillText("CMD_LIST " + CMD_LIST, 0, 80);
+        CANVAS_CONTEXT.fillText("BALLS::length " + BALLS.length, 0, 100);
+        CANVAS_CONTEXT.fillText("ITEMS::length " + ITEMS.length, 0, 120);
+        CANVAS_CONTEXT.fillText("BLOCKS::length " + BLOCKS.length, 0, 140);
+        CANVAS_CONTEXT.fillText("DestructibleBlockCount " + DestructibleBlockCount, 0, 160);
+        CANVAS_CONTEXT.fillText("ALL Object Count " + (BALLS.length + ITEMS.length + DestructibleBlockCount), 0, 180);
+        CANVAS_CONTEXT.fillText("AI_flag " + AI_flag, 0, 200);
     }
 }
 
@@ -530,6 +578,20 @@ function MainLoop() {
             break;
     }
     Render();
+    if (util.sameArray(["D", "D", "U", "U", "R", "L", "R", "L", "A", "B"], CMD_LIST)) {
+        if (debug_flag) {
+            debug_flag = false;
+        } else { debug_flag = true; }
+        SePlay("hit2");
+        CMD_LIST.splice(0);
+    }
+    if (util.sameArray(["A", "B", "R", "L", "R", "L", "D", "D", "U", "U"], CMD_LIST)) {
+        if (AI_flag) {
+            AI_flag = false;
+        } else { AI_flag = true; }
+        SePlay("hit2");
+        CMD_LIST.splice(0);
+    }
     setTimeout(MainLoop, 16.666);
 }
 
@@ -553,6 +615,12 @@ function Init() {
     AudioData["hit3"] = document.getElementById("se_hit3");
     AudioData["hit4"] = document.getElementById("se_hit4");
     AudioData["gradius"] = document.getElementById("se_gradius");
+    for (const pro in AudioData) {
+        if (AudioData[pro] == null) {
+            console.error("Can't load audio data " + pro); // 音声読み込みエラー
+            return false;
+        }
+    }
     return true;
 }
 /**

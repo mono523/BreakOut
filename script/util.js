@@ -4,6 +4,9 @@
  */
 // @ts-check
 
+import { Ball } from "./ball.js";
+import { Entity } from "./entity.js";
+
 //ユーティリティ
 
 /**
@@ -428,4 +431,79 @@ export function getProbability(p) {
     } else {
         return false;
     }
+}
+
+/**
+ * posに最も近いballをpos_arrayから見つける
+ * @param {Pos} pos 
+ * @param {Array<Entity>} entity_array 
+ * @returns  Pos or null
+ */
+export function getNearEntity(pos, entity_array) {
+    let close_entity = null;
+    let distance = 0;
+    let most_min_distance = 0;
+    for (var i = 0; i < entity_array.length; i++) {
+        distance = getDistance(pos, entity_array[i].pos);
+        if (i == 0) {
+            most_min_distance = distance; //一回目は代入
+            close_entity = entity_array[i];
+        } else {
+            if (distance < most_min_distance) { // 現時点で最も小さい距離より小さいなら値を上書き
+                most_min_distance = distance;
+                close_entity = entity_array[i];
+            }
+        }
+    }
+    return close_entity;
+}
+/**
+ *最も低い（yが高い）entityをentity_arrayから見つける
+ * @param {Array<Entity>} entity_array 
+ * @returns  {Array<Entity>}
+ */
+export function getLowerEntity(entity_array) {
+    if (entity_array.length > 0) {
+        entity_array.sort((en1, en2) => {
+            if (en1.rect.getCenter().y > en2.rect.getCenter().y) {
+                return -1;
+            } else if (en1.rect.getCenter().y == en2.rect.getCenter().y) {
+                return 0;
+            } else if (en1.rect.getCenter().y < en2.rect.getCenter().y) {
+                return 1;
+            }
+        });
+        return entity_array;
+    }
+    return null;
+}
+
+/**
+ * posにどちらのxが近いか pos1 -> true; pos2 -> false;
+ * @param {Pos} pos  - 基準
+ * @param {Pos} pos1 
+ * @param {Pos} pos2 
+ * @returns {boolean}
+ */
+function whichNear(pos, pos1, pos2) {
+    if (Math.abs(pos.x - pos1.x) > Math.abs(pos.x - pos2.x)) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+/** AIで拾う価値順にソート
+ * @param {Array<Ball>} balls -  
+ * @param {Rect} rect
+ */
+export function sortBallPriority(balls, rect) {
+    const down_ball = balls.filter((ball) => { if (ball.getDownTime() < 800) { return true; } });
+    const b = down_ball.sort((b1, b2) => {
+        let dt1 = b1.getDownTime();
+        let dt2 = b2.getDownTime();
+        if (dt1 < dt2) { return -1; }
+        if (dt1 > dt2) { return 1 };
+    });
+    return b;
 }

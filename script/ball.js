@@ -75,4 +75,17 @@ export class Ball extends Entity {
         ctx.fill();
         ctx.fillStyle = old_style;
     }
+    /**
+     * 画面外に行くまでにかかる時間(フレーム)
+     * 上を向いているときはステージの上辺で反射して帰ってくるまでの時間
+     * 時間 = 距離 / 速さ やってるだけ
+     * @returns {number}
+     */
+    getDownTime() {
+        if (this.angle < 0) { // 上向き
+            return Math.abs((500 + this.pos.y) / this.rate_y * this.speed);
+        } else {
+            return Math.abs((500 - this.pos.y) / this.rate_y * this.speed);
+        }
+    }
 }
