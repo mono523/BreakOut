@@ -104,6 +104,7 @@ var ClearFlag = false;
 var GameOverFlag = false;
 var konami_flag = false;
 var debug_flag = false;
+var AI_flag = false;
 const MAX_BALL_LIMIT = 1500;
 const CMD_LIST = [];
 const AudioData = {};
@@ -292,6 +293,30 @@ function Game() {
         BALLS.push(new Ball(pos, util.getRandomRange(-135, -45), 5, 0));
     }
     if (!ClearFlag && !GameOverFlag) {
+        if (AI_flag && BALLS.length > 0) {
+            const lower = util.getLowerEntity(BALLS);
+            const near_balls = util.sortBallPriority(BALLS,PADDLE.rect);
+            let near_entity = null;
+            if (near_balls.length == 0) {
+                if (ITEMS.length > 0) {
+                    near_entity = util.getNearEntity(PADDLE.pos, ITEMS);
+                }
+            } else {
+                near_entity = near_balls[0];
+            }
+            KeyStatus.Left = false;
+            KeyStatus.Right = false;
+            if (near_entity != null) {
+                if (Math.abs(PADDLE.rect.getCenter().x - near_entity.rect.getCenter().x) > 15) {
+                    if (PADDLE.rect.getCenter().x < near_entity.rect.getCenter().x) {
+                        KeyStatus.Right = true;
+                    }
+                    else {
+                        KeyStatus.Left = true;
+                    }
+                }
+            }
+        }
         PADDLE.update();
         let block_coll_snd = false;
         for (let index = 0; index < BALLS.length; index++) {
@@ -343,6 +368,9 @@ function Game() {
             if (item.rect.getCollision(PADDLE.rect)) {
                 ItemFunc(item.type);
                 ITEMS.splice(index, 1);
+            }
+            if(item.pos.y > 510){
+                ITEMS.splice(index,1);
             }
 
         }
@@ -452,6 +480,12 @@ function Render() {
             for (let index = 0; index < BALLS.length; index++) {
                 const ball = BALLS[index];
                 ball.render(CANVAS_CONTEXT);
+                if (debug_flag) {
+                    CANVAS_CONTEXT.fillStyle = "rgb(150, 150, 150)";
+                    CANVAS_CONTEXT.font = "10px メイリオ";
+                    let [x, y] = ball.rect.getCenter().getPos();
+                    util.renderTextToCenterPos(String(Math.floor(ball.getDownTime())), CANVAS_CONTEXT, x, y - 10, true);
+                }
                 //CANVAS_CONTEXT.fillStyle = "rgb(255, 0, 0)";
                 //CANVAS_CONTEXT.fillRect(ball.rect.pos.x, ball.rect.pos.y, ball.rect.width, ball.rect.height);
             }
@@ -503,6 +537,7 @@ function Render() {
         CANVAS_CONTEXT.fillText("BLOCKS::length " + BLOCKS.length, 0, 140);
         CANVAS_CONTEXT.fillText("DestructibleBlockCount " + DestructibleBlockCount, 0, 160);
         CANVAS_CONTEXT.fillText("ALL Object Count " + (BALLS.length + ITEMS.length + DestructibleBlockCount), 0, 180);
+        CANVAS_CONTEXT.fillText("AI_flag " + AI_flag, 0, 200);
     }
 }
 
@@ -547,7 +582,14 @@ function MainLoop() {
         if (debug_flag) {
             debug_flag = false;
         } else { debug_flag = true; }
-        SePlay("gradius");
+        SePlay("hit2");
+        CMD_LIST.splice(0);
+    }
+    if (util.sameArray(["A", "B", "R", "L", "R", "L", "D", "D", "U", "U"], CMD_LIST)) {
+        if (AI_flag) {
+            AI_flag = false;
+        } else { AI_flag = true; }
+        SePlay("hit2");
         CMD_LIST.splice(0);
     }
     setTimeout(MainLoop, 16.666);

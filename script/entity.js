@@ -34,7 +34,7 @@ export class Entity {
     setAngle(angle) {
         this.rate_x = Math.cos(angle * Math.PI / 180);
         this.rate_y = Math.sin(angle * Math.PI / 180);
-        this.angle = angle;
+        this.angle = angle%360;
     }
     /**
      * 毎フレーム呼ぶこと
