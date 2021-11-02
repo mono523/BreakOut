@@ -566,6 +566,12 @@ function Init() {
     AudioData["hit3"] = document.getElementById("se_hit3");
     AudioData["hit4"] = document.getElementById("se_hit4");
     AudioData["gradius"] = document.getElementById("se_gradius");
+    for (const pro in AudioData) {
+        if (AudioData[pro] == null) {
+            console.error("Can't load audio data " + pro); // 音声読み込みエラー
+            return false;
+        }
+    }
     return true;
 }
 /**
