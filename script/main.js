@@ -104,6 +104,7 @@ var ClearFlag = false;
 var GameOverFlag = false;
 var konami_flag = false;
 var debug_flag = false;
+const MAX_BALL_LIMIT = 1500;
 const CMD_LIST = [];
 const AudioData = {};
 /**
@@ -202,6 +203,9 @@ function ItemFunc(type) {
         case 3:
             //弾二倍
             for (let index = 0; index < BALLS.length / 2; index++) {
+                if (BALLS.length > MAX_BALL_LIMIT) {
+                    break;
+                }
                 const ball = BALLS[index];
                 BALLS.push(new Ball(ball.pos.copy(), ball.angle + util.getRandomRange(-180, 180), ball.size, ball.type))
             }
@@ -211,6 +215,9 @@ function ItemFunc(type) {
             let pos = PADDLE.pos.copy();
             pos.move(0, -5);
             for (let index = 0; index < 3; index++) {
+                if (BALLS.length > MAX_BALL_LIMIT) {
+                    break;
+                }
                 BALLS.push(new Ball(pos.copy(), -135 + (45 * index), 5, 0))
             }
             break;
@@ -277,7 +284,6 @@ function Game() {
         ITEMS.splice(0);
         // @ts-ignore
         [BLOCKS, DestructibleBlockCount] = BuildStage(STAGES[StageSelectIndex].blocks);
-        console.log(BLOCKS, DestructibleBlockCount);
     }
     if (!GAME_FLAG && KeyStatus.Shot) {
         GAME_FLAG = true;
@@ -462,8 +468,9 @@ function Render() {
 
 
             }
-            CANVAS_CONTEXT.fillStyle = "rgb(255,255,255)";
+            CANVAS_CONTEXT.fillStyle = "rgb(200,200,200)";
             PADDLE.render(CANVAS_CONTEXT);
+            CANVAS_CONTEXT.fillStyle = "rgb(255,255,255)";
             if (ClearFlag) {
                 CANVAS_CONTEXT.fillStyle = "rgb(100, 100, 100)";
                 CANVAS_CONTEXT.fillRect(0, 200, 500, 100);
