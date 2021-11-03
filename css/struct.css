@@ -12,3 +12,121 @@
     padding: 15px;
     margin: auto;
 }
+.button {
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+}
+.button a {
+    display: inline-flex;
+    border-radius: 50%;
+}
+.vertical {
+    margin-left: 100px;
+}
+.beside {
+    margin-left: 20px;
+    margin-top: -9.5em;
+}
+.ABbutton {
+    text-decoration: none;
+    margin-left: 30em;
+}
+.left {
+    display: inline-block;
+    width: 4em;
+    height: 4em;
+    border-radius: 50%;
+    margin-right: 3em;
+}
+.left:after {
+    content: '';
+    display: inline-block;
+    margin-top: 1.05em;
+    margin-left: 0.6em;
+    width: 1.4em;
+    height: 1.4em;
+    -moz-transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+    transform: rotate(-135deg);
+}
+.right {
+    display: inline-block;
+    width: 4em;
+    height: 4em;
+    border-radius: 50%;
+    margin-left: 1.5em;
+}
+.right:after {
+    content: '';
+    display: inline-block;
+    margin-top: 1.05em;
+    margin-left: -0.6em;
+    width: 1.4em;
+    height: 1.4em;
+    -moz-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+.up {
+    display: inline-block;
+    width: 4em;
+    height: 4em;
+    border-radius: 50%;
+    margin-bottom: 8em;
+}
+.up:after {
+    content: '';
+    display: inline-block;
+    margin-top: 1.4em;
+    margin-left: 0em;
+    width: 1.4em;
+    height: 1.4em;
+    -moz-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+.down {
+    display: inline-block;
+    width: 4em;
+    height: 4em;
+    border-radius: 50%;
+    margin-top: 10em;
+    margin-left: -90px;
+}
+.down:after {
+    content: '';
+    display: inline-block;
+    margin-top: 0.7em;
+    margin-left: 0em;
+    width: 1.4em;
+    height: 1.4em;
+    -moz-transform: rotate(135deg);
+    -webkit-transform: rotate(135deg);
+    transform: rotate(135deg);
+}
+.shot {
+    display: inline-block;
+    width: 4em;
+    height: 4em;
+    border-radius: 50%;
+}
+.shot:after {
+    content: 'A';
+    font-size: 30px;
+    font-weight: 900;
+    line-height: 2.0em;
+}
+.escape {
+    display: inline-block;
+    width: 4em;
+    height: 4em;
+    border-radius: 50%;
+    margin-left: 100px;
+}
+.escape:after {
+    content: 'B';
+    font-size: 30px;
+    font-weight: 900;
+    line-height: 2.0em;
+}

@@ -120,6 +120,8 @@ function KeyDown(evt) {
             KeyStatus.Up = true;
             CMD_LIST.push("U");
             break;
+        case "touchUp":
+            KeyStatus.Up = true;
         case "Down":
         case "ArrowDown":
             KeyStatus.Down = true;
@@ -182,6 +184,67 @@ function KeyUp(evt) {
         case "Escape":
             KeyStatus.Escape = false;
             break;
+    }
+}
+//スマホ対応
+var upButton = document.getElementById("upButton");
+upButton.addEventListener("touchstart", touchUp);
+upButton.addEventListener("touchend", touchUp);
+function touchUp(e){
+    if(e.type == 'touchstart'){
+        KeyStatus.Up = true;
+    } else if(e.type == 'touchend'){
+        KeyStatus.Up = false;
+    }
+}
+var downButton = document.getElementById("downButton");
+downButton.addEventListener("touchstart", touchDown);
+downButton.addEventListener("touchend", touchDown);
+function touchDown(e){
+    if(e.type == 'touchstart'){
+        KeyStatus.Down = true;
+    } else if(e.type == 'touchend'){
+        KeyStatus.Down = false;
+    }
+}
+var leftButton = document.getElementById("leftButton");
+leftButton.addEventListener("touchstart", touchLeft);
+leftButton.addEventListener("touchend", touchLeft);
+function touchLeft(e){
+    if(e.type == 'touchstart'){
+        KeyStatus.Left = true;
+    } else if(e.type == 'touchend'){
+        KeyStatus.Left = false;
+    }
+}
+var rightButton = document.getElementById("rightButton");
+rightButton.addEventListener("touchstart", touchRight);
+rightButton.addEventListener("touchend", touchRight);
+function touchRight(e){
+    if(e.type == 'touchstart'){
+        KeyStatus.Right = true;
+    } else if(e.type == 'touchend'){
+        KeyStatus.Right = false;
+    }
+}
+var shotButton = document.getElementById("shotButton");
+shotButton.addEventListener("touchstart", touchShot);
+shotButton.addEventListener("touchend", touchShot);
+function touchShot(e){
+    if(e.type == 'touchstart'){
+        KeyStatus.Shot = true;
+    } else if(e.type == 'touchend'){
+        KeyStatus.Shot = false;
+    }
+}
+var escapeButton = document.getElementById("escapeButton");
+escapeButton.addEventListener("touchstart", touchEscape);
+escapeButton.addEventListener("touchend", touchEscape);
+function touchEscape(e){
+    if(e.type == 'touchstart'){
+        KeyStatus.Escape = true;
+    } else if(e.type == 'touchend'){
+        KeyStatus.Escape = false;
     }
 }
 /**
