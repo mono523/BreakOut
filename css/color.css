@@ -13,3 +13,46 @@ body {
     color: #7fbfff;
     text-shadow:3px 3px 2px #3d3d3d;
 }
+.button a:hover .left,  a:hover .right,  a:hover .up,  a:hover .down,  a:hover .shot,  a:hover .escape {
+    border: 0.5em solid #e74c3c;
+}
+.button a:hover .left:after,  a:hover .right:after,  a:hover .up:after,  a:hover .down:after {
+    border-top: 0.5em solid #333;
+    border-right: 0.5em solid #333;
+}
+.left {
+    border: 0.5em solid #333;
+}
+.left:after {
+    border-top: 0.5em solid #333;
+    border-right: 0.5em solid #333;
+}
+.right {
+    border: 0.5em solid #333;
+}
+.right:after {
+    border-top: 0.5em solid #333;
+    border-right: 0.5em solid #333;
+}
+.up {
+    border: 0.5em solid #333;
+}
+.up:after {
+    border-top: 0.5em solid #333;
+    border-right: 0.5em solid #333;
+}
+.down {
+    border: 0.5em solid #333;
+}
+.down:after {
+    border-top: 0.5em solid #333;
+    border-right: 0.5em solid #333;
+}
+.shot {
+    color: #333;
+    border: 0.5em solid #333;
+}
+.escape {
+    color: #333;
+    border: 0.5em solid #333;
+}
