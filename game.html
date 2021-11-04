@@ -2,63 +2,65 @@
 <html lang="ja">
 
 <head>
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="css/struct.css">
-    <link rel="stylesheet" href="css/color.css">
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="css/struct.css">
+  <link rel="stylesheet" href="css/color.css">
 </head>
 
 <body>
-    <div class="BackGroundScreen">
-      <div class="screen">
-        <h1>Break Out</h1>
-        <hr>
-        <canvas id="canvas" width="500px" height="500px"></canvas>
-        <hr>
-        <small>Copyright (c) 2021 mono / Gabuniku</small>
-      </div>
+  <div class="BackGroundScreen">
+    <div class="screen">
+      <h1>Break Out</h1>
+      <hr>
+      <canvas id="canvas" width="500px" height="500px"></canvas>
+      <hr>
+      <small>Copyright (c) 2021 mono / Gabuniku</small>
     </div>
+  </div>
+  <div class="hidden" id="control">
     <div class="vertical">
       <div id="upButton" class="button">
-        <a href="JavaScript:void(0)" onClick="new_open();return false">
-          <span class="up"></span>
+        <a href="JavaScript:void(0)">
+        <span class="up"></span>
         </a>
       </div>
       <div id="downButton" class="button">
-        <a href="JavaScript:void(0)" onClick="new_open();return false">
+        <a href="JavaScript:void(0)">
           <span class="down"></span>
         </a>
       </div>
     </div>
     <div class="beside">
       <div id="leftButton" class="button">
-        <a href="JavaScript:void(0)" onClick="new_open();return false">
+        <a href="JavaScript:void(0)">
           <span class="left"></span>
         </a>
       </div>
       <div id="rightButton" class="button">
-        <a href="JavaScript:void(0)" onClick="new_open();return false">
+        <a href="JavaScript:void(0)">
           <span class="right"></span>
         </a>
       </div>
     </div>
     <div class="ABbutton">
       <div id="shotButton" class="button">
-        <a href="JavaScript:void(0)" onClick="new_open();return false" style="text-decoration: none">
+        <a href="JavaScript:void(0)"style="text-decoration: none">
           <span class="shot"></span>
         </a>
       </div>
       <div id="escapeButton" class="button">
-        <a href="JavaScript:void(0)" onClick="new_open();return false" style="text-decoration: none">
+        <a href="JavaScript:void(0)"style="text-decoration: none">
           <span class="escape"></span>
         </a>
       </div>
     </div>
-    <script type="module" src="./script/main.js"></script>
-    <audio id="se_hit" src="./sound/hit.mp3"></audio>
-    <audio id="se_hit2" src="./sound/hit2.mp3"></audio>
-    <audio id="se_hit3" src="./sound/hit3.mp3"></audio>
-    <audio id="se_hit4" src="./sound/hit4.mp3"></audio>
-    <audio id="se_gradius" src="./sound/gradius.mp3"></audio>
+  </div>
+  <script type="module" src="./script/main.js"></script>
+  <audio id="se_hit" src="./sound/hit.mp3"></audio>
+  <audio id="se_hit2" src="./sound/hit2.mp3"></audio>
+  <audio id="se_hit3" src="./sound/hit3.mp3"></audio>
+  <audio id="se_hit4" src="./sound/hit4.mp3"></audio>
+  <audio id="se_gradius" src="./sound/gradius.mp3"></audio>
 </body>
 
 </html>

@@ -498,7 +498,7 @@ function whichNear(pos, pos1, pos2) {
  * @param {Rect} rect
  */
 export function sortBallPriority(balls, rect) {
-    const down_ball = balls.filter((ball) => { if (ball.getDownTime() < 800) { return true; } });
+    const down_ball = balls.filter((ball) => { if (ball.getDownTime() < 800 && ball.pos.y < 460) { return true; } });
     const b = down_ball.sort((b1, b2) => {
         let dt1 = b1.getDownTime();
         let dt2 = b2.getDownTime();
