@@ -130,3 +130,7 @@
     font-weight: 900;
     line-height: 2.0em;
 }
+
+.hidden{
+    display: none;
+}

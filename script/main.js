@@ -190,60 +190,66 @@ function KeyUp(evt) {
 var upButton = document.getElementById("upButton");
 upButton.addEventListener("touchstart", touchUp);
 upButton.addEventListener("touchend", touchUp);
-function touchUp(e){
-    if(e.type == 'touchstart'){
+function touchUp(e) {
+    if (e.type == 'touchstart') {
         KeyStatus.Up = true;
-    } else if(e.type == 'touchend'){
+        CMD_LIST.push("U");
+    } else if (e.type == 'touchend') {
         KeyStatus.Up = false;
     }
 }
 var downButton = document.getElementById("downButton");
 downButton.addEventListener("touchstart", touchDown);
 downButton.addEventListener("touchend", touchDown);
-function touchDown(e){
-    if(e.type == 'touchstart'){
+function touchDown(e) {
+    if (e.type == 'touchstart') {
         KeyStatus.Down = true;
-    } else if(e.type == 'touchend'){
+        CMD_LIST.push("D");
+    } else if (e.type == 'touchend') {
         KeyStatus.Down = false;
     }
 }
 var leftButton = document.getElementById("leftButton");
 leftButton.addEventListener("touchstart", touchLeft);
 leftButton.addEventListener("touchend", touchLeft);
-function touchLeft(e){
-    if(e.type == 'touchstart'){
+function touchLeft(e) {
+    if (e.type == 'touchstart') {
         KeyStatus.Left = true;
-    } else if(e.type == 'touchend'){
+        CMD_LIST.push("L");
+    } else if (e.type == 'touchend') {
         KeyStatus.Left = false;
     }
 }
 var rightButton = document.getElementById("rightButton");
 rightButton.addEventListener("touchstart", touchRight);
 rightButton.addEventListener("touchend", touchRight);
-function touchRight(e){
-    if(e.type == 'touchstart'){
+function touchRight(e) {
+    if (e.type == 'touchstart') {
         KeyStatus.Right = true;
-    } else if(e.type == 'touchend'){
+        CMD_LIST.push("R");
+    } else if (e.type == 'touchend') {
         KeyStatus.Right = false;
     }
 }
 var shotButton = document.getElementById("shotButton");
 shotButton.addEventListener("touchstart", touchShot);
 shotButton.addEventListener("touchend", touchShot);
-function touchShot(e){
-    if(e.type == 'touchstart'){
+function touchShot(e) {
+    if (e.type == 'touchstart') {
         KeyStatus.Shot = true;
-    } else if(e.type == 'touchend'){
+        CMD_LIST.push("A");
+    } else if (e.type == 'touchend') {
         KeyStatus.Shot = false;
     }
 }
 var escapeButton = document.getElementById("escapeButton");
 escapeButton.addEventListener("touchstart", touchEscape);
 escapeButton.addEventListener("touchend", touchEscape);
-function touchEscape(e){
-    if(e.type == 'touchstart'){
+function touchEscape(e) {
+    if (e.type == 'touchstart') {
         KeyStatus.Escape = true;
-    } else if(e.type == 'touchend'){
+        CMD_LIST.push("B");
+    } else if (e.type == 'touchend') {
         KeyStatus.Escape = false;
     }
 }
@@ -357,8 +363,7 @@ function Game() {
     }
     if (!ClearFlag && !GameOverFlag) {
         if (AI_flag && BALLS.length > 0) {
-            const lower = util.getLowerEntity(BALLS);
-            const near_balls = util.sortBallPriority(BALLS,PADDLE.rect);
+            const near_balls = util.sortBallPriority(BALLS, PADDLE.rect);
             let near_entity = null;
             if (near_balls.length == 0) {
                 if (ITEMS.length > 0) {
@@ -432,8 +437,8 @@ function Game() {
                 ItemFunc(item.type);
                 ITEMS.splice(index, 1);
             }
-            if(item.pos.y > 510){
-                ITEMS.splice(index,1);
+            if (item.pos.y > 510) {
+                ITEMS.splice(index, 1);
             }
 
         }
@@ -617,6 +622,14 @@ function SePlay(key) {
         console.log(error);
     }
 }
+/** UserAgentからのスマホ判定*/
+function isSmartPhone() {
+    if (navigator.userAgent.match(/iPhone|Android.+Mobile/)) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 /**
  * メインループ
@@ -683,6 +696,9 @@ function Init() {
             console.error("Can't load audio data " + pro); // 音声読み込みエラー
             return false;
         }
+    }
+    if (isSmartPhone()) {
+        document.getElementById("control").classList.remove("hidden");
     }
     return true;
 }
