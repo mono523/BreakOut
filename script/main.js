@@ -359,7 +359,7 @@ function Game() {
         GAME_FLAG = true;
         let pos = PADDLE.rect.getCenter();
         pos.move(0, -10)
-        BALLS.push(new Ball(pos, util.getRandomRange(-135, -45), 5, 0));
+        BALLS.push(new Ball(pos, util.getRandomRange(-135, -45), 5, 3));
     }
     if (!ClearFlag && !GameOverFlag) {
         if (AI_flag && BALLS.length > 0) {
@@ -400,6 +400,10 @@ function Game() {
                 let pos_p = PADDLE.pos.getPos()[0];
                 let dis = (pos - pos_p) / (PADDLE.rect.width / 2);
                 ball.setAngle(-90 + (60 * dis));
+                if (ball.physics) {
+                    ball.vec.y = -25;
+                    ball.vec.x = Math.sin(-90 + (60 * dis)) * 3;
+                }
                 paddle_coli = true;
             };
             for (let row = 0; row < BLOCKS.length; row++) {
@@ -415,8 +419,15 @@ function Game() {
                             block_coll_snd = true;
                             ROW.splice(col, 1);
                             DestructibleBlockCount--;
+                            if (ball.physics) {
+                                if (edge == util.RectEdgeDirection.UP || edge == util.RectEdgeDirection.DOWN) { 
+                                    ball.vec.y *= -1;
+                                }else{
+                                    ball.vec.x *= -1;
+                                }
+                            }
                             if (util.getProbability(20)) {
-                                ITEMS.push(new Item(block.pos.copy(), Math.floor(util.getRandomRange(3, 5))))
+                                //ITEMS.push(new Item(block.pos.copy(), Math.floor(util.getRandomRange(3, 5))))
                             }
                         }
                         if (block_coll) {

@@ -4,6 +4,7 @@
  */
 // @ts-check
 import { Entity } from "./entity.js"
+import { GRAVITY, ReflectionCoefficient, Vec2 } from "./physics.js";
 import * as util from "./util.js"
 
 // ボール
@@ -21,22 +22,54 @@ export class Ball extends Entity {
         super(pos, new util.Rect(pos.copy(), size + 1, size + 1), angle, 3);
         this.type = type;
         this.size = size;
+        this.physics = (type == 3);
+        this.vec = null;
+        if (this.physics) {
+            this.vec = new Vec2(0, 10);
+            this.speed = 5;
+        }
     }
     update() {
-        this.goForward();
-        if (this.pos.x - this.size <= 0 || this.pos.x + this.size >= 500) {
-            let angle = util.getReflectAngle(this.angle, util.RectEdgeDirection.LEFT);
-            this.setAngle(angle);
-            if (this.pos.x - this.size <= 0) {
-                this.pos.x = this.size;
-            } else {
-                this.pos.x = 500 - this.size;
+        if (this.physics) {
+            // 物理学mode 
+            // 物理平均点のワイが物理を実装するｗ
+            if(this.vec.y < 5){
+                this.vec.y += GRAVITY;
+            }else{
+                this.vec.y = 5;
             }
-        }
-        if (this.pos.y - this.size <= 0) {
-            let angle = util.getReflectAngle(this.angle, util.RectEdgeDirection.UP);
-            this.pos.y = 0 + this.size;
-            this.setAngle(angle);
+            this.pos.x +=  this.vec.x;
+            this.pos.y +=  this.vec.y;
+            console.log(this.vec)
+            if (this.pos.x - this.size <= 0 || this.pos.x + this.size >= 500) {
+                this.vec.x *= -ReflectionCoefficient;
+                if (this.pos.x - this.size <= 0) {
+                    this.pos.x = this.size;
+                } else {
+                    this.pos.x = 500 - this.size;
+                }
+            }
+            if (this.pos.y - this.size <= 0) {
+                this.vec.y = 5;//*= -ReflectionCoefficient;
+            }
+          
+            this.setAngle(this.vec.getAngle());
+        } else {
+            this.goForward();
+            if (this.pos.x - this.size <= 0 || this.pos.x + this.size >= 500) {
+                let angle = util.getReflectAngle(this.angle, util.RectEdgeDirection.LEFT);
+                this.setAngle(angle);
+                if (this.pos.x - this.size <= 0) {
+                    this.pos.x = this.size;
+                } else {
+                    this.pos.x = 500 - this.size;
+                }
+            }
+            if (this.pos.y - this.size <= 0) {
+                let angle = util.getReflectAngle(this.angle, util.RectEdgeDirection.UP);
+                this.pos.y = 0 + this.size;
+                this.setAngle(angle);
+            }
         }
         super.update();
     }
